@@ -13,9 +13,9 @@ const Button = ({ onClick, text }) => (
 )
 
 const StatisticLine = ({ text, value }) => (
-  <p>
+  <div>
     {text} {value}
-  </p>
+  </div>
 )
 
 const Statistics = ({ good, neutral, bad }) => {
