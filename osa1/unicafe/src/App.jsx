@@ -12,7 +12,7 @@ const Button = ({ onClick, text }) => (
   </button>
 )
 
-const Label = ({ text, value }) => (
+const StatisticLine = ({ text, value }) => (
   <p>
     {text} {value}
   </p>
@@ -32,12 +32,12 @@ const Statistics = ({ good, neutral, bad }) => {
   }
   return (
     <div>
-      <Label text="good" value={good} />
-      <Label text="neutral" value={neutral} />
-      <Label text="bad" value={bad} />
-      <Label text="all" value={all} />
-      <Label text="average" value={average} />
-      <Label text="positive" value={positive + ' %'} />
+      <StatisticLine text="good" value={good} />
+      <StatisticLine text="neutral" value={neutral} />
+      <StatisticLine text="bad" value={bad} />
+      <StatisticLine text="all" value={all} />
+      <StatisticLine text="average" value={average} />
+      <StatisticLine text="positive" value={positive + ' %'} />
     </div>
   )
 }
