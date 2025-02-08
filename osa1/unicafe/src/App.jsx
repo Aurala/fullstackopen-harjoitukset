@@ -1,9 +1,15 @@
 import { useState } from 'react'
 
-const Header = ({ text }) => <h1>{text}</h1>
+const Header = ({ text }) => (
+  <h1>
+    {text}
+  </h1>
+)
 
 const Button = ({ onClick, text }) => (
-  <button onClick={onClick}>{text}</button>
+  <button onClick={onClick}>
+    {text}
+  </button>
 )
 
 const Label = ({ text, value }) => (
@@ -30,7 +36,9 @@ const App = () => {
       <Label text="good" value={good} />
       <Label text="neutral" value={neutral} />
       <Label text="bad" value={bad} />
-
+      <Label text="all" value={good + neutral + bad} />
+      <Label text="average" value={((good - bad) / (good + neutral + bad)) || 0} />
+      <Label text="positive" value={(((good / (good + neutral + bad)) * 100) || 0) + ' %'} />
     </div>
   )
 }
