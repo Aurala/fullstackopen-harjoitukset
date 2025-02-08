@@ -18,6 +18,23 @@ const Label = ({ text, value }) => (
   </p>
 )
 
+const Statistics = ({ good, neutral, bad }) => {
+  const all = good + neutral + bad
+  const average = (good - bad) / all || 0
+  const positive = (good / all) * 100 || 0
+
+  return (
+    <>
+      <Label text="good" value={good} />
+      <Label text="neutral" value={neutral} />
+      <Label text="bad" value={bad} />
+      <Label text="all" value={all} />
+      <Label text="average" value={average} />
+      <Label text="positive" value={positive + ' %'} />
+    </>
+  )
+}
+
 const App = () => {
   const [good, setGood] = useState(0)
   const [neutral, setNeutral] = useState(0)
@@ -33,12 +50,7 @@ const App = () => {
 
       <Header text="statistics" />
 
-      <Label text="good" value={good} />
-      <Label text="neutral" value={neutral} />
-      <Label text="bad" value={bad} />
-      <Label text="all" value={good + neutral + bad} />
-      <Label text="average" value={((good - bad) / (good + neutral + bad)) || 0} />
-      <Label text="positive" value={(((good / (good + neutral + bad)) * 100) || 0) + ' %'} />
+      <Statistics good={good} neutral={neutral} bad={bad} />
     </div>
   )
 }
