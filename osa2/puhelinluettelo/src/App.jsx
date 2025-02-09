@@ -8,10 +8,14 @@ const Entry = ({ person }) => {
 
 const App = () => {
   const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-1234567' },
-  ]) 
+    { name: 'Arto Hellas', number: '040-123456' },
+    { name: 'Ada Lovelace', number: '39-44-5323523' },
+    { name: 'Dan Abramov', number: '12-43-234345' },
+    { name: 'Mary Poppendieck', number: '39-23-6423122' }
+  ])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
+  const [filter, setNewFilter] = useState('')
   
   const isExistingPerson = (name) => {
     const exists = persons.some(person => person.name === name)
@@ -30,6 +34,11 @@ const App = () => {
     setNewNumber(event.target.value)
   }
 
+  const handleFilter = (event) => {
+    console.log("handleFilter:", event.target.value)
+    setNewFilter(event.target.value)
+  }
+
   const addPerson = (event) => {
     event.preventDefault()
     console.log('Button clicked', event.target)
@@ -41,9 +50,17 @@ const App = () => {
     }
   }
 
+  const filteredPersons = persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase()))
+
   return (
     <div>
       <h2>Phonebook</h2>
+      <form>
+        <div>
+          filter shown with <input onChange={handleFilter} />
+        </div>
+      </form>
+      <h2>add a new</h2>
       <form>
         <div>
           name: <input onChange={handlePersonChange} />
@@ -56,7 +73,7 @@ const App = () => {
         </div>
       </form>
       <h2>Numbers</h2>
-        {persons.map(person => <Entry key={person.name} person={person} />)}
+        {filteredPersons.map(person => <Entry key={person.name} person={person} />)}
     </div>
   )
 
