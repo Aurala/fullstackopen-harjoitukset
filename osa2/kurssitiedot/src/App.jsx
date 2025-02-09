@@ -8,7 +8,7 @@ const Header = (props) => {
 const Part = (props) => {
   console.log("Part:", props)
   return (
-    <p key={props.part.id}>
+    <p>
       {props.part.name} {props.part.exercises}
     </p>
   )
@@ -18,23 +18,20 @@ const Content = (props) => {
   console.log("Content:", props)
   return (
     <div>
-      {props.parts.map(part => <Part part={part} />)}
+      {props.parts.map(part => <Part key={part.id} part={part} />)}
     </div>
   )
 }
 
-/* Ei tarvita vielä step6:ssä
-
 const Total = (props) => {
   console.log("Total:", props)
-  let total = props.parts[0].exercises + props.parts[1].exercises + props.parts[2].exercises
+  let total =  props.parts.reduce((sum, part) => sum + part.exercises, 0)
   return (
     <p>
-      Number of exercises {total}
+      <b>total of  {total} exercises</b>
     </p>
   )
 }
-  */
 
 const Course = (props) => {
   console.log("Course:", props)
@@ -42,6 +39,7 @@ const Course = (props) => {
     <div>
       <Header course={props.course} />
       <Content parts={props.course.parts} />
+      <Total parts={props.course.parts} />
     </div>
   )
 }
