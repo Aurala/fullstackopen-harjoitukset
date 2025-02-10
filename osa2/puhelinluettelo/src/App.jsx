@@ -1,19 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 import FilterForm from './components/FilterForm'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 
 const App = () => {
 
-  // Test data
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456' },
-    { name: 'Ada Lovelace', number: '39-44-5323523' },
-    { name: 'Dan Abramov', number: '12-43-234345' },
-    { name: 'Mary Poppendieck', number: '39-23-6423122' }
-  ])
-
   // States
+  const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setNewFilter] = useState('')
@@ -55,6 +49,18 @@ const App = () => {
       setNewName('')
     }
   }
+
+  // Fetch data from the server
+  useEffect(() => {
+    console.log('Fetching data from server')
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        console.log('Data fetched:', response.data)
+        setPersons(response.data)
+      })
+  }, [])  
+  console.log('Persons:', persons)
 
   return (
     <div>
