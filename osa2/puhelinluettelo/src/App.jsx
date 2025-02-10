@@ -24,14 +24,6 @@ const App = () => {
   }, [])
   console.log('Persons:', persons)
 
-  // Checks if person exists in the phonebook already, and alerts if so
-  const isExistingPerson = (name) => {
-    const exists = persons.some(person => person.name === name)
-    console.log("isExistingPerson:", name, exists)
-    if (exists) {alert(`${newName} is already added to the phonebook`)}
-    return exists
-  }
-
   // Event handler for name input
   const handlePersonChange = (event) => {
     console.log("handlePersonChange:", event.target.value)
@@ -50,12 +42,18 @@ const App = () => {
     setNewFilter(event.target.value)
   }
 
-  // Adds person to the phonebook if it doesn't exist already, sends to the server
+  // Adds person to the phonebook, sends to the server
+  // If person already exists, after confirmation updates the number
   const addPerson = (event) => {
     event.preventDefault()
     console.log('Button clicked', event.target)
     const personObject = { name: newName, number: newNumber }
-    if (!isExistingPerson(newName)) {
+    const existingPerson = persons.find(person => person.name === newName)
+    
+    if (existingPerson) {
+      console.log('Person already exists:', existingPerson)
+      updatePerson(existingPerson.id)
+    } else {
       console.log('Adding person:', personObject)
       phonebookService
         .create(personObject)
@@ -64,6 +62,26 @@ const App = () => {
           console.log('Data received:', response)
           setPersons(persons.concat(response))
           setNewName('')
+        })
+    }
+  }
+
+  // Updates person's number in the phonebook, after confirmation sends to the server
+  const updatePerson = (id) => {
+    console.log('Updating person:', id)
+    const person = persons.find(person => person.id === id)
+    const changedPerson = { ...person, number: newNumber }
+
+    if (window.confirm(`${person.name} is already added to the phonebook, replace the old number with a new one?`)) {
+      console.log('Confirmed update:', changedPerson)
+      phonebookService
+        .update(id, changedPerson)
+        .then(response => {
+          console.log('Data sent:', changedPerson)
+          console.log('Data received:', response)
+          setPersons(persons.map(person => person.id !== id ? person : response))
+          setNewName('')
+          setNewNumber('')
         })
     }
   }
