@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import FilterForm from './components/FilterForm'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import phonebookService from './services/phonebook'
 
 const App = () => {
 
@@ -11,7 +11,19 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setNewFilter] = useState('')
-  
+
+  // Fetch data from the server
+  useEffect(() => {
+    console.log('Fetching data from server')
+    phonebookService
+      .getAll()
+      .then(initialPersons => {
+        console.log('Data fetched:', initialPersons)
+        setPersons(initialPersons)
+      })
+  }, [])
+  console.log('Persons:', persons)
+
   // Checks if person exists in the phonebook already, and alerts if so
   const isExistingPerson = (name) => {
     const exists = persons.some(person => person.name === name)
@@ -45,28 +57,16 @@ const App = () => {
     const personObject = { name: newName, number: newNumber }
     if (!isExistingPerson(newName)) {
       console.log('Adding person:', personObject)
-      axios
-        .post('http://localhost:3001/persons', personObject)
+      phonebookService
+        .create(personObject)
         .then(response => {
           console.log('Data sent:', personObject)
-          console.log('Data received:', response.data)
-          setPersons(persons.concat(response.data))
+          console.log('Data received:', response)
+          setPersons(persons.concat(response))
           setNewName('')
         })
     }
   }
-
-  // Fetch data from the server
-  useEffect(() => {
-    console.log('Fetching data from server')
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        console.log('Data fetched:', response.data)
-        setPersons(response.data)
-      })
-  }, [])  
-  console.log('Persons:', persons)
 
   return (
     <div>
