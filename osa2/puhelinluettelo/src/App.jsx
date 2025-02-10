@@ -38,15 +38,21 @@ const App = () => {
     setNewFilter(event.target.value)
   }
 
-  // Adds person to the phonebook
+  // Adds person to the phonebook if it doesn't exist already, sends to the server
   const addPerson = (event) => {
     event.preventDefault()
     console.log('Button clicked', event.target)
     const personObject = { name: newName, number: newNumber }
     if (!isExistingPerson(newName)) {
       console.log('Adding person:', personObject)
-      setPersons(persons.concat(personObject))
-      setNewName('')
+      axios
+        .post('http://localhost:3001/persons', personObject)
+        .then(response => {
+          console.log('Data sent:', personObject)
+          console.log('Data received:', response.data)
+          setPersons(persons.concat(response.data))
+          setNewName('')
+        })
     }
   }
 
