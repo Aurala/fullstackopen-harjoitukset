@@ -68,6 +68,22 @@ const App = () => {
     }
   }
 
+  // Deletes person from the phonebook, after confirmation sends to the server
+  const deletePerson = (id) => {
+    console.log('Deleting person:', id)
+    const person = persons.find(person => person.id === id)
+    if (window.confirm(`Delete ${person.name}?`)) {
+      console.log('Confirmed deletion:', person)
+      phonebookService
+        .remove(id)
+        .then(response => {
+          console.log('Data sent:', id)
+          console.log('Data received:', response)
+          setPersons(persons.filter(person => person.id !== id))
+        })
+    }
+  }
+
   return (
     <div>
       
@@ -78,7 +94,7 @@ const App = () => {
       <PersonForm handlePersonChange={handlePersonChange} handleNumberChange={handleNumberChange} addPerson={addPerson} />
       
       <h3>Numbers</h3>
-      <Persons persons={persons} filter={filter} />
+      <Persons persons={persons} filter={filter} deletePerson={deletePerson} />
 
     </div>
   )
