@@ -12,7 +12,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setNewFilter] = useState('')
-  const [notification, setNotification] = useState('')
+  const [notification, setNotification] = useState([])
 
   // Fetch data from the server
   useEffect(() => {
@@ -22,7 +22,7 @@ const App = () => {
       .then(initialPersons => {
         console.log('Data fetched:', initialPersons)
         setPersons(initialPersons)
-        showNotification('Phonebook downloaded from server', 1)
+        showNotification('Phonebook downloaded from server', 1, false)
       })
   }, [])
   console.log('Persons:', persons)
@@ -65,7 +65,7 @@ const App = () => {
           console.log('Data received:', response)
           setPersons(persons.concat(response))
           setNewName('')
-          showNotification(`Added ${newName}`, 5)
+          showNotification(`Added ${newName}`, 5, false)
         })
     }
   }
@@ -86,7 +86,11 @@ const App = () => {
           setPersons(persons.map(person => person.id !== id ? person : response))
           setNewName('')
           setNewNumber('')
-          showNotification(`Updated ${person.name}`, 5)
+          showNotification(`Updated ${person.name}`, 5, false)
+        })
+        .catch(error => {
+          console.log('Error updating:', error)
+          showNotification(`Information of ${person.name} has already been removed from the server.`, 5, true)
         })
     }
   }
@@ -95,6 +99,7 @@ const App = () => {
   const deletePerson = (id) => {
     console.log('Deleting person:', id)
     const person = persons.find(person => person.id === id)
+
     if (window.confirm(`Delete ${person.name}?`)) {
       console.log('Confirmed deletion:', person)
       phonebookService
@@ -103,22 +108,32 @@ const App = () => {
           console.log('Data sent:', id)
           console.log('Data received:', response)
           setPersons(persons.filter(person => person.id !== id))
-          showNotification(`Deleted ${person.name}`, 5)
+          showNotification(`Deleted ${person.name}`, 5, false)
+        })
+        .catch(error => {
+          console.log('Error deleting:', error)
+          showNotification(`Information of ${person.name} has already been removed from the server.`, 5, true)
         })
     }
   }
 
-  const showNotification = (message, seconds) => {
-    setNotification(message)
+  // Shows notification for a specified amount of time
+  // If error is true, shows error message
+  const showNotification = (message, seconds, error) => {
+    const emptyNotificationObject = { message: '', error: false }
+    const notificationObject = { message: message, error: error }
+    
+    console.log('Notification:', notificationObject)
+    setNotification(notificationObject)
     setTimeout(() => {
-      setNotification('')
+      setNotification(emptyNotificationObject)
     }, seconds * 1000)
   }
 
   return (
     <div>
       
-      <Notification message={notification} />
+      <Notification notification={notification} />
 
       <h2>Phonebook</h2>
       <FilterForm filter={filter} handleFilterChange={handleFilter} />
