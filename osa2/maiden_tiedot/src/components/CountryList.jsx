@@ -1,3 +1,37 @@
+import React, { useState, useEffect } from 'react'
+import weatherService from '../services/weather'
+
+const Weather = ({ country }) => {
+  const [weather, setWeather] = useState(null)
+
+  useEffect(() => {
+    const fetchWeather = async () => {
+      console.log('Fetching weather:', country)
+      const latitude = country.capitalInfo.latlng[0]
+      const longitude = country.capitalInfo.latlng[1]
+      console.log('Capital coords:', latitude, longitude)
+      try {
+        const weatherData = await weatherService.getCity(latitude, longitude)
+        setWeather(weatherData)
+      } catch (error) {
+        console.error('Error fetching weather data:', error)
+      }
+    }
+
+    fetchWeather()
+  }, [country])
+
+  if (!weather) { 
+    return <div>Loading weather...</div>
+  }
+
+  return (
+    <div>
+      Temperature: {weather.current.temperature_2m} {weather.current_units.temperature_2m}
+    </div>
+  )
+}
+
 const Flag = ({ country }) => {
   return (
     <div>
@@ -12,16 +46,18 @@ const Country = ({ country }) => {
   return (
     <div>
       <h1>{country.name.common}</h1>
-      <div>{`capital ${country.capital}`}</div>
-      <div>{`population ${country.population}`}</div>
-      <div>{`area ${country.area}`}</div>
-      <h2>languages</h2>
+      <div>{`Capital: ${country.capital}`}</div>
+      <div>{`Population: ${country.population}`}</div>
+      <div>{`Area: ${country.area}`}</div>
+      <h3>Languages</h3>
       <ul>
         {Object.values(country.languages).map(language => (
           <li key={language}>{language}</li>
         ))}
       </ul>
       <Flag country={country} />
+      <h3>{`Weather in ${country.capital}`}</h3>
+      <Weather country={country} />
     </div>
   )
 }
