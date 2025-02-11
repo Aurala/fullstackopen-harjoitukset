@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import FilterForm from './components/FilterForm'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import Notification from './components/Notification'
 import phonebookService from './services/phonebook'
 
 const App = () => {
@@ -11,6 +12,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setNewFilter] = useState('')
+  const [notification, setNotification] = useState('')
 
   // Fetch data from the server
   useEffect(() => {
@@ -20,6 +22,7 @@ const App = () => {
       .then(initialPersons => {
         console.log('Data fetched:', initialPersons)
         setPersons(initialPersons)
+        showNotification('Phonebook downloaded from server', 1)
       })
   }, [])
   console.log('Persons:', persons)
@@ -62,6 +65,7 @@ const App = () => {
           console.log('Data received:', response)
           setPersons(persons.concat(response))
           setNewName('')
+          showNotification(`Added ${newName}`, 5)
         })
     }
   }
@@ -82,6 +86,7 @@ const App = () => {
           setPersons(persons.map(person => person.id !== id ? person : response))
           setNewName('')
           setNewNumber('')
+          showNotification(`Updated ${person.name}`, 5)
         })
     }
   }
@@ -98,13 +103,23 @@ const App = () => {
           console.log('Data sent:', id)
           console.log('Data received:', response)
           setPersons(persons.filter(person => person.id !== id))
+          showNotification(`Deleted ${person.name}`, 5)
         })
     }
+  }
+
+  const showNotification = (message, seconds) => {
+    setNotification(message)
+    setTimeout(() => {
+      setNotification('')
+    }, seconds * 1000)
   }
 
   return (
     <div>
       
+      <Notification message={notification} />
+
       <h2>Phonebook</h2>
       <FilterForm filter={filter} handleFilterChange={handleFilter} />
 
