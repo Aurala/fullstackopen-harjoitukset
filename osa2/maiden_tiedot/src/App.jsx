@@ -27,7 +27,7 @@ function App() {
   return (
     <div>
       <SearchForm filter={filter} handleFilterChange={handleFilter} />
-      <CountryList countries={countries} filter={filter} />
+      <CountryList countries={countries} filter={filter} setFilter={setFilter} />
     </div>
   )
 }
