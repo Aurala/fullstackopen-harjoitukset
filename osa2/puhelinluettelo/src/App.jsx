@@ -65,7 +65,12 @@ const App = () => {
           console.log('Data received:', response)
           setPersons(persons.concat(response))
           setNewName('')
+          setNewNumber('')
           showNotification(`Added ${newName}`, 5, false)
+        }).catch(error => {
+          const errorMessage = error.response?.data?.error || 'An unexpected error occurred'
+          console.log(`Error adding ${newName}:`, errorMessage)
+          showNotification(errorMessage, 5, true)
         })
     }
   }
