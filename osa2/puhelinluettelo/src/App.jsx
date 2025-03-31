@@ -94,8 +94,9 @@ const App = () => {
           showNotification(`Updated ${person.name}`, 5, false)
         })
         .catch(error => {
-          console.log('Error updating:', error)
-          showNotification(`Information of ${person.name} has already been removed from the server.`, 5, true)
+          const errorMessage = error.response?.data?.error || 'An unexpected error occurred'
+          console.log(`Error adding ${newName}:`, errorMessage)
+          showNotification(errorMessage, 5, true)
         })
     }
   }
