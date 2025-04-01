@@ -1,0 +1,19 @@
+#
+# DEV server requests
+#
+
+# List all blogs in the database
+GET http://127.0.0.1:3003/api/blogs
+
+###
+
+# Add a blog
+POST http://127.0.0.1:3003/api/blogs
+Content-Type: application/json
+
+{
+  "author": "Antti Author",
+  "title": "Antti's Autoblog",
+  "url": "https://antti-autoblog.tld",
+  "likes": 0
+}
