@@ -53,7 +53,7 @@ const testBlogs = [
     title: "First class tests",
     author: "Robert C. Martin",
     __v: 0
-  },
+  }
 ]
 
 beforeEach(async () => {
@@ -148,6 +148,33 @@ test('an invalid object id is managed properly, 400 Bad Request is returned', as
   await api
     .delete(`/api/blogs/${blogToDelete}`)
     .expect(400)
+})
+
+test('a blog can be updated', async () => {
+  const blogToUpdate = testBlogs[0]._id
+  const updatedBlog = {
+    ...testBlogs[0],
+    title: 'New title',
+    author: 'New author',
+    url: 'New url',
+    likes: 42
+  }
+  delete updatedBlog._id
+  delete updatedBlog.__v
+
+  await api
+    .put(`/api/blogs/${blogToUpdate}`)
+    .send(updatedBlog)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs')
+  const returnedBlog = response.body.find(blog => blog.id === blogToUpdate)
+
+  assert.strictEqual(returnedBlog.title, 'New title')
+  assert.strictEqual(returnedBlog.author, 'New author')
+  assert.strictEqual(returnedBlog.url, 'New url')
+  assert.strictEqual(returnedBlog.likes, 42)
 })
 
 after(async () => {
