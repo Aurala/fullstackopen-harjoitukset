@@ -79,7 +79,7 @@ test('the unique identifier property of the blog posts is named id, not _id', as
   })
 })
 
-test('the blog can be added', async () => {
+test('a blog can be added', async () => {
   await api
     .post('/api/blogs')
     .send(testBlogs[3])
@@ -93,7 +93,7 @@ test('the blog can be added', async () => {
   assert(authors.includes('Robert C. Martin'))
 })
 
-test('if likes property is missing, it will default to 0', async () => {
+test('if property likes is missing, it will default to 0', async () => {
   await api
     .post('/api/blogs')
     .send(testBlogs[3])
@@ -105,17 +105,48 @@ test('if likes property is missing, it will default to 0', async () => {
     assert.strictEqual(response.body[3].likes, 0)
 })
 
-test('if title property is missing, 400 Bad Request is returned', async () => {
+test('if property title is missing, 400 Bad Request is returned', async () => {
   await api
     .post('/api/blogs')
     .send(testBlogs[4])
     .expect(400)
 })
 
-test('if url property is missing, 400 Bad Request is returned', async () => {
+test('if property url is missing, 400 Bad Request is returned', async () => {
   await api
     .post('/api/blogs')
     .send(testBlogs[5])
+    .expect(400)
+})
+
+test('a blog can be deleted', async () => {
+  const blogToDelete = testBlogs[0]._id
+  const blogName = testBlogs[0].title
+
+  await api
+    .delete(`/api/blogs/${blogToDelete}`)
+    .expect(204)
+
+  const response = await api.get('/api/blogs')
+  const titles = response.body.map(r => r.title)
+
+  assert.strictEqual(response.body.length, 2)
+  assert(!titles.includes(blogName))
+})
+
+test('a non-existing object id is managed properly, 404 Not Found is returned', async () => {
+  const blogToDelete = '5a422b891b54a676234d17fb'
+
+  await api
+    .delete(`/api/blogs/${blogToDelete}`)
+    .expect(404)
+})
+
+test('an invalid object id is managed properly, 400 Bad Request is returned', async () => {
+  const blogToDelete = 'invalidObjectId'
+
+  await api
+    .delete(`/api/blogs/${blogToDelete}`)
     .expect(400)
 })
 
