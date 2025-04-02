@@ -9,7 +9,7 @@ const { initial } = require('lodash');
 
 const api = supertest(app)
 
-const initialBlogs = [
+const testBlogs = [
   {
     _id: "5a422a851b54a676234d17f7",
     title: "React patterns",
@@ -34,22 +34,37 @@ const initialBlogs = [
     likes: 12,
     __v: 0
   },
+  // Missing likes property
   {
     _id: "5a422b891b54a676234d17fa",
     title: "First class tests",
     author: "Robert C. Martin",
     url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html",
     __v: 0
-  }
+  },
+  // Broken blog post, title property is missing
+  {
+    _id: "5a422b891b54a676234d17fa",
+    author: "Robert C. Martin",
+    url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html",
+    __v: 0
+  },
+  // Broken blog post, url property is missing
+  {
+    _id: "5a422b891b54a676234d17fa",
+    title: "First class tests",
+    author: "Robert C. Martin",
+    __v: 0
+  },
 ]
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-  let blogObject = new Blog(initialBlogs[0])
+  let blogObject = new Blog(testBlogs[0])
   await blogObject.save()
-  blogObject = new Blog(initialBlogs[1])
+  blogObject = new Blog(testBlogs[1])
   await blogObject.save()
-  blogObject = new Blog(initialBlogs[2])
+  blogObject = new Blog(testBlogs[2])
   await blogObject.save()
 })
 
@@ -69,27 +84,41 @@ test('the unique identifier property of the blog posts is named id, not _id', as
 test('the blog can be added', async () => {
   await api
     .post('/api/blogs')
-    .send(initialBlogs[3])
+    .send(testBlogs[3])
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
   const response = await api.get('/api/blogs')
   const authors = response.body.map(r => r.author)
   
-  assert.strictEqual(response.body.length, initialBlogs.length)
+  assert.strictEqual(response.body.length, 4)
   assert(authors.includes('Robert C. Martin'))
 })
 
 test('if likes property is missing, it will default to 0', async () => {
   await api
     .post('/api/blogs')
-    .send(initialBlogs[3])
+    .send(testBlogs[3])
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
     const response = await api.get('/api/blogs')
     
     assert.strictEqual(response.body[3].likes, 0)
+})
+
+test('if title property is missing, 400 Bad Request is returned', async () => {
+  await api
+    .post('/api/blogs')
+    .send(testBlogs[4])
+    .expect(400)
+})
+
+test('if url property is missing, 400 Bad Request is returned', async () => {
+  await api
+    .post('/api/blogs')
+    .send(testBlogs[5])
+    .expect(400)
 })
 
 after(async () => {
