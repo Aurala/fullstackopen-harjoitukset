@@ -4,8 +4,6 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const assert = require('node:assert/strict');
 const app = require('../app');
-const blog = require('../models/blog');
-const { initial } = require('lodash');
 
 const api = supertest(app)
 
@@ -34,7 +32,7 @@ const testBlogs = [
     likes: 12,
     __v: 0
   },
-  // Missing likes property
+  // Missing property 'likes'
   {
     _id: "5a422b891b54a676234d17fa",
     title: "First class tests",
@@ -42,14 +40,14 @@ const testBlogs = [
     url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html",
     __v: 0
   },
-  // Broken blog post, title property is missing
+  // Broken blog post, property 'title' is missing
   {
     _id: "5a422b891b54a676234d17fa",
     author: "Robert C. Martin",
     url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html",
     __v: 0
   },
-  // Broken blog post, url property is missing
+  // Broken blog post, property 'url' is missing
   {
     _id: "5a422b891b54a676234d17fa",
     title: "First class tests",
