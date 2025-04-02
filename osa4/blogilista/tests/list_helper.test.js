@@ -96,11 +96,34 @@ describe('most blogs', () => {
   test('when list has one blog, its author is returned', () => {
     const result = listHelper.mostBlogs(listWithOneBlog)
     assert.strictEqual(result.author, 'Michael Chan')
+    assert.strictEqual(result.blogs, 1)
   })
 
   test('when list has many blogs, the author with most blogs is returned', () => {
     const result = listHelper.mostBlogs(listWithManyBlogs)
     assert.strictEqual(result.author, 'Edsger W. Dijkstra')
+    assert.strictEqual(result.blogs, 2)
+  })
+
+})
+
+describe('most likes', () => {
+
+  test('when list has no blogs, null is returned', () => {
+    const result = listHelper.mostLikes(listWithNoBlogs)
+    assert.strictEqual(result, null)
+  })
+
+  test('when list has one blog, its author is returned', () => {
+    const result = listHelper.mostLikes(listWithOneBlog)
+    assert.strictEqual(result.author, 'Michael Chan')
+    assert.strictEqual(result.likes, 7)
+  })
+
+  test('when list has many blogs, the author with most likes is returned', () => {
+    const result = listHelper.mostLikes(listWithManyBlogs)
+    assert.strictEqual(result.author, 'Edsger W. Dijkstra')
+    assert.strictEqual(result.likes, 17)
   })
 
 })
