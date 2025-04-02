@@ -5,6 +5,7 @@ const supertest = require('supertest')
 const assert = require('node:assert/strict');
 const app = require('../app');
 const blog = require('../models/blog');
+const { initial } = require('lodash');
 
 const api = supertest(app)
 
@@ -51,13 +52,11 @@ beforeEach(async () => {
   await blogObject.save()
   blogObject = new Blog(initialBlogs[2])
   await blogObject.save()
-  blogObject = new Blog(initialBlogs[3])
-  await blogObject.save()
 })
 
 test('the right amount of blogs is returned', async () => {
   const response = await api.get('/api/blogs')
-  assert.strictEqual(response.body.length, 4)
+  assert.strictEqual(response.body.length, 3)
 })
 
 test('the unique identifier property of the blog posts is named id, not _id', async () => {
@@ -66,6 +65,20 @@ test('the unique identifier property of the blog posts is named id, not _id', as
     assert.notStrictEqual(blog.id, undefined)
     assert.strictEqual(blog._id, undefined)
   })
+})
+
+test('the blog can be added', async () => {
+  await api
+    .post('/api/blogs')
+    .send(initialBlogs[3])
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs')
+  const authors = response.body.map(r => r.author)
+  
+  assert.strictEqual(response.body.length, initialBlogs.length)
+  assert(authors.includes('Robert C. Martin'))
 })
 
 after(async () => {
