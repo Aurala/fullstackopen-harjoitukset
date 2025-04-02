@@ -38,8 +38,7 @@ const initialBlogs = [
     _id: "5a422b891b54a676234d17fa",
     title: "First class tests",
     author: "Robert C. Martin",
-    url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
-    likes: 12,
+    url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html",
     __v: 0
   }
 ]
@@ -79,6 +78,18 @@ test('the blog can be added', async () => {
   
   assert.strictEqual(response.body.length, initialBlogs.length)
   assert(authors.includes('Robert C. Martin'))
+})
+
+test('if likes property is missing, it will default to 0', async () => {
+  await api
+    .post('/api/blogs')
+    .send(initialBlogs[3])
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+    const response = await api.get('/api/blogs')
+    
+    assert.strictEqual(response.body[3].likes, 0)
 })
 
 after(async () => {
