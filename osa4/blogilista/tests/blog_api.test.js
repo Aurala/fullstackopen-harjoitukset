@@ -4,10 +4,11 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const assert = require('node:assert/strict');
 const app = require('../app');
+const { initial } = require('lodash');
 
 const api = supertest(app)
 
-const testBlogs = [
+const initialBlogs = [
   {
     _id: "5a422a851b54a676234d17f7",
     title: "React patterns",
@@ -31,7 +32,9 @@ const testBlogs = [
     url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
     likes: 12,
     __v: 0
-  },
+  }
+]
+const testBlogs = [
   // Missing property 'likes'
   {
     _id: "5a422b891b54a676234d17fa",
@@ -58,17 +61,15 @@ const testBlogs = [
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-  let blogObject = new Blog(testBlogs[0])
-  await blogObject.save()
-  blogObject = new Blog(testBlogs[1])
-  await blogObject.save()
-  blogObject = new Blog(testBlogs[2])
-  await blogObject.save()
+  for (const blog of initialBlogs) {
+    const blogObject = new Blog(blog);
+    await blogObject.save();
+  }
 })
 
 test('the right amount of blogs is returned', async () => {
   const response = await api.get('/api/blogs')
-  assert.strictEqual(response.body.length, 3)
+  assert.strictEqual(response.body.length, initialBlogs.length)
 })
 
 test('the unique identifier property of the blog posts is named id, not _id', async () => {
@@ -82,46 +83,45 @@ test('the unique identifier property of the blog posts is named id, not _id', as
 test('a blog can be added', async () => {
   await api
     .post('/api/blogs')
-    .send(testBlogs[3])
+    .send(testBlogs[0])
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
   const response = await api.get('/api/blogs')
   const authors = response.body.map(r => r.author)
   
-  assert.strictEqual(response.body.length, 4)
+  assert.strictEqual(response.body.length, initialBlogs.length + 1)
   assert(authors.includes('Robert C. Martin'))
 })
 
 test('if property likes is missing, it will default to 0', async () => {
   await api
     .post('/api/blogs')
-    .send(testBlogs[3])
+    .send(testBlogs[0])
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
     const response = await api.get('/api/blogs')
-    
-    assert.strictEqual(response.body[3].likes, 0)
+    assert.strictEqual(response.body[response.body.length - 1].likes, 0)
 })
 
 test('if property title is missing, 400 Bad Request is returned', async () => {
   await api
     .post('/api/blogs')
-    .send(testBlogs[4])
+    .send(testBlogs[1])
     .expect(400)
 })
 
 test('if property url is missing, 400 Bad Request is returned', async () => {
   await api
     .post('/api/blogs')
-    .send(testBlogs[5])
+    .send(testBlogs[2])
     .expect(400)
 })
 
 test('a blog can be deleted', async () => {
-  const blogToDelete = testBlogs[0]._id
-  const blogName = testBlogs[0].title
+  const blogToDelete = initialBlogs[0]._id
+  const blogName = initialBlogs[0].title
 
   await api
     .delete(`/api/blogs/${blogToDelete}`)
@@ -151,9 +151,9 @@ test('an invalid object id is managed properly, 400 Bad Request is returned', as
 })
 
 test('a blog can be updated', async () => {
-  const blogToUpdate = testBlogs[0]._id
+  const blogToUpdate = initialBlogs[0]._id
   const updatedBlog = {
-    ...testBlogs[0],
+    ...initialBlogs[0],
     title: 'New title',
     author: 'New author',
     url: 'New url',
@@ -171,10 +171,10 @@ test('a blog can be updated', async () => {
   const response = await api.get('/api/blogs')
   const returnedBlog = response.body.find(blog => blog.id === blogToUpdate)
 
-  assert.strictEqual(returnedBlog.title, 'New title')
-  assert.strictEqual(returnedBlog.author, 'New author')
-  assert.strictEqual(returnedBlog.url, 'New url')
-  assert.strictEqual(returnedBlog.likes, 42)
+  assert.strictEqual(returnedBlog.title, updatedBlog.title)
+  assert.strictEqual(returnedBlog.author, updatedBlog.author)
+  assert.strictEqual(returnedBlog.url, updatedBlog.url)
+  assert.strictEqual(returnedBlog.likes, updatedBlog.likes)
 })
 
 after(async () => {

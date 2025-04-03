@@ -17,3 +17,20 @@ Content-Type: application/json
   "url": "https://antti-autoblog.tld",
   "likes": 0
 }
+
+###
+
+# List users
+GET http://127.0.0.1:3003/api/users
+
+###
+
+# Add a user
+POST http://127.0.0.1:3003/api/users
+Content-Type: application/json
+
+{
+  "username": "iines",
+  "name": "Iines Ankka",
+  "password": "password"
+}
