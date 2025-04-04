@@ -7,6 +7,7 @@ const app = require('../app');
 
 const api = supertest(app)
 
+// Added to the database before each test
 const initialUsers = [
   {
     username: 'tupu',
@@ -25,22 +26,41 @@ const initialUsers = [
   }
 ]
 
+// Invalid users that should not be created because of missing/invalid properties
 const invalidUsers = [
-  // Invalid user, property username is missing
+  // 'username' is missing
   {
-    name: 'Roope Ankka',
+    name: 'Aku Ankka',
     password: 'password'
   },
-  // Invalid user, property password is missing
+  // 'password' is missing
   {
     username: 'aku',
     name: 'Aku Ankka',
   },
-  // Invalid user, property name is missing
+  // 'name' is missing
   {
     username: 'aku',
     password: 'password'
-  }
+  },
+  // 'username' is too short
+  {
+    username: 'ak',
+    name: 'Aku Ankka',
+    password: 'password'
+  },
+  // 'password' is too short
+  {
+    username: 'aku',
+    name: 'Aku Ankka',
+    password: 'pa'
+  },
+  // 'username' is not unique
+  {
+    username: 'tupu',
+    name: 'Tupu Ankka',
+    password: 'password'
+  },
 ]
 
 beforeEach(async () => {
@@ -56,7 +76,7 @@ test('the right amount of users is returned', async () => {
   assert.strictEqual(response.body.length, 3)
 })
 
-test('can add a user', async () => {
+test('a new user can be added', async () => {
   const newUser = {
     username: 'aku',
     name: 'Aku Ankka',
@@ -73,15 +93,16 @@ test('can add a user', async () => {
   assert.strictEqual(response.body.length, initialUsers.length + 1)
 })
 
-test('password hashes are not returned', async () => {
+test('no password hashes are returned', async () => {
   const response = await api.get('/api/users')
   response.body.forEach(user => {
     assert.strictEqual(user.passwordHash, undefined)
   })
 })
 
-test('if user is missing properties, return 400', async () => {
+test('no users are created with missing/invalid properties', async () => {
   for (const newUser of invalidUsers) {
+    console.log(`Testing user creation with: ${JSON.stringify(newUser)}`)
     await api
       .post('/api/users')
       .send(newUser)

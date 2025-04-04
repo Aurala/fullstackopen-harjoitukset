@@ -21,6 +21,9 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message })
   }
+  if (error.code === 11000) {
+    return response.status(400).json({ error: 'username must be unique' });
+  }
 
   return response.status(500).json({ error: 'internal server error' });
 }
