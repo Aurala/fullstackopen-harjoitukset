@@ -10,19 +10,29 @@ const api = supertest(app)
 // Added to the database before each test
 const initialUsers = [
   {
+    _id: '67f0e1c07d106a8788ca445f',
     username: 'tupu',
     name: 'Tupu Ankka',
-    passwordHash: '$2b$10$dtKdi1.9ZYYQxkwziimBzu7s5GBEI3OjTXCNKV3OsmAS4TRnJ1gzj'
+    passwordHash: '$2b$10$dtKdi1.9ZYYQxkwziimBzu7s5GBEI3OjTXCNKV3OsmAS4TRnJ1gzj',
+    blogs: [
+      '5a422a851b54a676234d17f7',
+      '5a422aa71b54a676234d17f8',
+      '5a422b3a1b54a676234d17f9'
+    ]
   },
   {
+    _id: '67f0e1c07d106a8788ca4461',
     username: 'hupu',
     name: 'Hupu Ankka',
-    passwordHash: '$2b$10$dtKdi1.9ZYYQxkwziimBzu7s5GBEI3OjTXCNKV3OsmAS4TRnJ1gzk'
+    passwordHash: '$2b$10$dtKdi1.9ZYYQxkwziimBzu7s5GBEI3OjTXCNKV3OsmAS4TRnJ1gzk',
+    blogs: []
   },
   {
+    _id: '67f0e1c07d106a8788ca4463',
     username: 'lupu',
     name: 'Lupu Ankka',
-    passwordHash: '$2b$10$dtKdi1.9ZYYQxkwziimBzu7s5GBEI3OjTXCNKV3OsmAS4TRnJ1gzl'
+    passwordHash: '$2b$10$dtKdi1.9ZYYQxkwziimBzu7s5GBEI3OjTXCNKV3OsmAS4TRnJ1gzl',
+    blogs: []
   }
 ]
 
