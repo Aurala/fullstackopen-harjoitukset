@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs')
+const supertest = require('supertest')
 const User = require('../models/user')
 const Blog = require('../models/blog')
 
@@ -135,11 +136,22 @@ const initializeBlogs = async () => {
   }
 }
 
+const getToken = async (api, username, password) => {
+  const response = await api
+    .post('/api/login')
+    .send({ username, password })
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+    return response.body.token
+}
+
 module.exports = {
   initialBlogs,
   invalidBlogs,
   initialUsers,
   invalidUsers,
   initializeBlogs,
-  initializeUsers
+  initializeUsers,
+  getToken
 }

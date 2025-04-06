@@ -1,9 +1,11 @@
 const { connectToMemoryServer, closeMemoryServer } = require('./mongo_test_helper')
 const supertest = require('supertest')
 const app = require('../app');
-const { initializeUsers, initializeBlogs, initialBlogs, invalidBlogs } = require('./test_helper')
+const { getToken, initializeUsers, initializeBlogs, initialUsers, initialBlogs, invalidBlogs } = require('./test_helper')
 
 const api = supertest(app)
+
+let token
 
 beforeAll(async () => {
   await connectToMemoryServer()
@@ -16,6 +18,8 @@ afterAll(async () => {
 beforeEach(async () => {
   await initializeUsers()
   await initializeBlogs()
+
+  token = await getToken(api, initialUsers[1].username, initialUsers[1].password)
 })
 
 test('the right amount of blogs is returned', async () => {
@@ -33,9 +37,12 @@ test('the unique identifier property of the blog posts is named id, not _id', as
 
 test('a blog can be added, even if likes not set', async () => {
   const expectedAuthor = invalidBlogs[0].author
+  const blogToAdd = invalidBlogs[0]
+
   await api
     .post('/api/blogs')
-    .send(invalidBlogs[0])
+    .set('Authorization', `Bearer ${token}`)
+    .send(blogToAdd)
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
@@ -46,9 +53,31 @@ test('a blog can be added, even if likes not set', async () => {
   expect(authors).toContain(expectedAuthor)
 })
 
+test('a blog is not added if token is missing', async () => {
+  const blogToAdd = invalidBlogs[0]
+
+  await api
+    .post('/api/blogs')
+    .send(blogToAdd)
+    .expect(401)
+    .expect('Content-Type', /application\/json/)
+})
+
+test('a blog is not added if token is invalid', async () => {
+  const blogToAdd = invalidBlogs[0]
+
+  await api
+    .post('/api/blogs')
+    .set('Authorization', `Bearer 123`)
+    .send(blogToAdd)
+    .expect(401)
+    .expect('Content-Type', /application\/json/)
+})
+
 test('if property title is missing, 400 Bad Request is returned', async () => {
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(invalidBlogs[1])
     .expect(400)
 })
@@ -56,6 +85,7 @@ test('if property title is missing, 400 Bad Request is returned', async () => {
 test('if property url is missing, 400 Bad Request is returned', async () => {
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(invalidBlogs[2])
     .expect(400)
 })
