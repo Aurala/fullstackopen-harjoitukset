@@ -10,7 +10,7 @@ GET http://127.0.0.1:3003/api/blogs
 # Add a blog
 POST http://127.0.0.1:3003/api/blogs
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InR1cHUiLCJpZCI6IjY3ZjJhZTkxOWIyMGEzMjc1MmMzNWQ4YyIsImlhdCI6MTc0Mzk1OTA2MH0.1HG2MEHjxBFGpX2hWIkzTmiJrSTAtjRlxJa-Z8dxrKU
+Authorization: Bearer ...
 
 {
   "author": "Antti Author",
@@ -23,7 +23,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InR1c
 
 # Delete a blog
 DELETE http://127.0.0.1:3003/api/blogs/67f2ac5472d8cc8f7644883d
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InR1cHUiLCJpZCI6IjY3ZjJhZTkxOWIyMGEzMjc1MmMzNWQ4YyIsImlhdCI6MTc0Mzk1ODk4MX0.-qu8o_QfqLt7AzoCoY1U32J9FBu5XZR9V0OTWMyxGLk
+Authorization: Bearer ...
 
 ###
 
