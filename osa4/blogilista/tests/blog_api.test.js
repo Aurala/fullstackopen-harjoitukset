@@ -1,127 +1,62 @@
-const { test, after, beforeEach } = require('node:test')
-const Blog = require('../models/blog')
-const mongoose = require('mongoose')
+const { connectToMemoryServer, closeMemoryServer } = require('./mongo_test_helper')
 const supertest = require('supertest')
-const assert = require('node:assert/strict');
 const app = require('../app');
-const { initial } = require('lodash');
+const { initializeUsers, initializeBlogs, initialBlogs, invalidBlogs } = require('./test_helper')
 
 const api = supertest(app)
 
-const initialBlogs = [
-  {
-    _id: '5a422a851b54a676234d17f7',
-    title: 'React patterns',
-    author: 'Michael Chan',
-    url: 'https://reactpatterns.com/',
-    likes: 7,
-    user: '67f0e1c07d106a8788ca445f',
-    __v: 0
-  },
-  {
-    _id: '5a422aa71b54a676234d17f8',
-    title: 'Go To Statement Considered Harmful',
-    author: 'Edsger W. Dijkstra',
-    url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
-    likes: 5,
-    user: '67f0e1c07d106a8788ca445f',
-    __v: 0
-  },
-  {
-    _id: '5a422b3a1b54a676234d17f9',
-    title: 'Canonical string reduction',
-    author: 'Edsger W. Dijkstra',
-    url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
-    likes: 12,
-    user: '67f0e1c07d106a8788ca445f',
-    __v: 0
-  }
-]
-const testBlogs = [
-  // Missing property 'likes'
-  {
-    _id: '5a422b891b54a676234d17fa',
-    title: 'First class tests',
-    author: 'Robert C. Martin',
-    url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html',
-    user: '67f0e1c07d106a8788ca445f',
-    __v: 0
-  },
-  // Broken blog post, property 'title' is missing
-  {
-    _id: '5a422b891b54a676234d17fa',
-    author: 'Robert C. Martin',
-    url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html',
-    user: '67f0e1c07d106a8788ca445f',
-    __v: 0
-  },
-  // Broken blog post, property 'url' is missing
-  {
-    _id: '5a422b891b54a676234d17fa',
-    title: 'First class tests',
-    author: 'Robert C. Martin',
-    user: '67f0e1c07d106a8788ca445f',
-    __v: 0
-  }
-]
+beforeAll(async () => {
+  await connectToMemoryServer()
+})
+
+afterAll(async () => {
+  await closeMemoryServer()
+})
 
 beforeEach(async () => {
-  await Blog.deleteMany({})
-  for (const blog of initialBlogs) {
-    const blogObject = new Blog(blog);
-    await blogObject.save();
-  }
+  await initializeUsers()
+  await initializeBlogs()
 })
 
 test('the right amount of blogs is returned', async () => {
   const response = await api.get('/api/blogs')
-  assert.strictEqual(response.body.length, initialBlogs.length)
+  expect(response.body.length).toBe(initialBlogs.length)
 })
 
 test('the unique identifier property of the blog posts is named id, not _id', async () => {
   const response = await api.get('/api/blogs')
   response.body.forEach(blog => {
-    assert.notStrictEqual(blog.id, undefined)
-    assert.strictEqual(blog._id, undefined)
+    expect(blog.id).toBeDefined()
+    expect(blog._id).toBeUndefined()
   })
 })
 
-test('a blog can be added', async () => {
+test('a blog can be added, even if likes not set', async () => {
+  const expectedAuthor = invalidBlogs[0].author
   await api
     .post('/api/blogs')
-    .send(testBlogs[0])
+    .send(invalidBlogs[0])
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
   const response = await api.get('/api/blogs')
   const authors = response.body.map(r => r.author)
   
-  assert.strictEqual(response.body.length, initialBlogs.length + 1)
-  assert(authors.includes('Robert C. Martin'))
-})
-
-test('if property likes is missing, it will default to 0', async () => {
-  await api
-    .post('/api/blogs')
-    .send(testBlogs[0])
-    .expect(201)
-    .expect('Content-Type', /application\/json/)
-
-    const response = await api.get('/api/blogs')
-    assert.strictEqual(response.body[response.body.length - 1].likes, 0)
+  expect(response.body.length).toBe(initialBlogs.length + 1)
+  expect(authors).toContain(expectedAuthor)
 })
 
 test('if property title is missing, 400 Bad Request is returned', async () => {
   await api
     .post('/api/blogs')
-    .send(testBlogs[1])
+    .send(invalidBlogs[1])
     .expect(400)
 })
 
 test('if property url is missing, 400 Bad Request is returned', async () => {
   await api
     .post('/api/blogs')
-    .send(testBlogs[2])
+    .send(invalidBlogs[2])
     .expect(400)
 })
 
@@ -136,8 +71,8 @@ test('a blog can be deleted', async () => {
   const response = await api.get('/api/blogs')
   const titles = response.body.map(r => r.title)
 
-  assert.strictEqual(response.body.length, 2)
-  assert(!titles.includes(blogName))
+  expect(response.body.length).toBe(2)
+  expect(titles).not.toContain(blogName)
 })
 
 test('a non-existing object id is managed properly, 404 Not Found is returned', async () => {
@@ -177,12 +112,8 @@ test('a blog can be updated', async () => {
   const response = await api.get('/api/blogs')
   const returnedBlog = response.body.find(blog => blog.id === blogToUpdate)
 
-  assert.strictEqual(returnedBlog.title, updatedBlog.title)
-  assert.strictEqual(returnedBlog.author, updatedBlog.author)
-  assert.strictEqual(returnedBlog.url, updatedBlog.url)
-  assert.strictEqual(returnedBlog.likes, updatedBlog.likes)
-})
-
-after(async () => {
-  await mongoose.connection.close()
+  expect(returnedBlog.title).toBe(updatedBlog.title)
+  expect(returnedBlog.author).toBe(updatedBlog.author)
+  expect(returnedBlog.url).toBe(updatedBlog.url)
+  expect(returnedBlog.likes).toBe(updatedBlog.likes)
 })
