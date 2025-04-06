@@ -10,7 +10,7 @@ GET http://127.0.0.1:3003/api/blogs
 # Add a blog
 POST http://127.0.0.1:3003/api/blogs
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImlpbmVzIiwiaWQiOiI2N2YyODI0NjVhMWI2NTczNTVlYTVmNmEiLCJpYXQiOjE3NDM5NTU5MzB9.u2j1eHwONOzwL_KcqsOa99Gu_h4UCShV0_sGah90cEA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImlpbmVzIiwiaWQiOiI2N2YyODI0NjVhMWI2NTczNTVlYTVmNmEiLCJpYXQiOjE3NDM5NTcwNTB9.XoQ0V3mPJ4VmyeGKBWjmrHL1kkyv0fyjkWdOd-OQSBE
 
 {
   "author": "Antti Author",
