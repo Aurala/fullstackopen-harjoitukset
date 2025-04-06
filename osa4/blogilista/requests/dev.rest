@@ -32,5 +32,16 @@ Content-Type: application/json
 {
   "username": "iines",
   "name": "Iines Ankka",
-  "password": "password"
+  "password": "iinespass"
+}
+
+###
+
+# Login
+POST http://127.0.0.1:3003/api/login
+Content-Type: application/json
+
+{
+  "username": "iines",
+  "password": "iinespass"
 }
