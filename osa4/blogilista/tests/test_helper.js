@@ -1,5 +1,4 @@
 const bcrypt = require('bcryptjs')
-const supertest = require('supertest')
 const User = require('../models/user')
 const Blog = require('../models/blog')
 

@@ -1,7 +1,7 @@
 const { connectToMemoryServer, closeMemoryServer } = require('./mongo_test_helper')
 const supertest = require('supertest')
 const app = require('../app');
-const { initializeUsers, initializeBlogs, initialUsers, invalidUsers } = require('./test_helper')
+const { initializeUsers, initializeBlogs, initialUsers } = require('./test_helper')
 
 const api = supertest(app)
 
