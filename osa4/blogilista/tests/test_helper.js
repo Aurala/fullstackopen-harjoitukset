@@ -10,7 +10,7 @@ const initialBlogs = [
       author: 'Michael Chan',
       url: 'https://reactpatterns.com/',
       likes: 7,
-      user: '67f0e1c07d106a8788ca445f'
+      user: '67f0e1c07d106a8788ca4400'
   },
   {
       _id: '5a422aa71b54a676234d17f8',
@@ -18,7 +18,7 @@ const initialBlogs = [
       author: 'Edsger W. Dijkstra',
       url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
       likes: 5,
-      user: '67f0e1c07d106a8788ca445f'
+      user: '67f0e1c07d106a8788ca4401'
   },
   {
       _id: '5a422b3a1b54a676234d17f9',
@@ -26,7 +26,7 @@ const initialBlogs = [
       author: 'Edsger W. Dijkstra',
       url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
       likes: 12,
-      user: '67f0e1c07d106a8788ca445f'
+      user: '67f0e1c07d106a8788ca4402'
   }
 ]
 
@@ -57,6 +57,7 @@ const invalidBlogs = [
 
 const initialUsers = [
   {
+    _id: '67f0e1c07d106a8788ca4400',
     username: 'tupu',
     name: 'Tupu Ankka',
     password: 'tupupass',
@@ -67,12 +68,14 @@ const initialUsers = [
     ]
   },
   {
+    _id: '67f0e1c07d106a8788ca4401',
     username: 'hupu',
     name: 'Hupu Ankka',
     password: 'hupupass',
     blogs: []
   },
   {
+    _id: '67f0e1c07d106a8788ca4402',
     username: 'lupu',
     name: 'Lupu Ankka',
     password: 'lupupass',

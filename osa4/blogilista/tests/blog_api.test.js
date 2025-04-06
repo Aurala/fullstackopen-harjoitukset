@@ -19,7 +19,7 @@ beforeEach(async () => {
   await initializeUsers()
   await initializeBlogs()
 
-  token = await getToken(api, initialUsers[1].username, initialUsers[1].password)
+  token = await getToken(api, initialUsers[0].username, initialUsers[0].password)
 })
 
 test('the right amount of blogs is returned', async () => {
@@ -96,6 +96,7 @@ test('a blog can be deleted', async () => {
 
   await api
     .delete(`/api/blogs/${blogToDelete}`)
+    .set('Authorization', `Bearer ${token}`)
     .expect(204)
 
   const response = await api.get('/api/blogs')
@@ -105,11 +106,30 @@ test('a blog can be deleted', async () => {
   expect(titles).not.toContain(blogName)
 })
 
+test('a blog belonging to someone else can not be deleted', async () => {
+  const blogToDelete = initialBlogs[1]._id
+
+  await api
+    .delete(`/api/blogs/${blogToDelete}`)
+    .set('Authorization', `Bearer ${token}`)
+    .expect(401)
+})
+
+test('a blog can not be deleted without a valid token', async () => {
+  const blogToDelete = initialBlogs[0]._id
+
+  await api
+    .delete(`/api/blogs/${blogToDelete}`)
+    .expect(401)
+    .expect('Content-Type', /application\/json/)
+})
+
 test('a non-existing object id is managed properly, 404 Not Found is returned', async () => {
   const blogToDelete = '5a422b891b54a676234d17fb'
 
   await api
     .delete(`/api/blogs/${blogToDelete}`)
+    .set('Authorization', `Bearer ${token}`)
     .expect(404)
 })
 
@@ -118,6 +138,7 @@ test('an invalid object id is managed properly, 400 Bad Request is returned', as
 
   await api
     .delete(`/api/blogs/${blogToDelete}`)
+    .set('Authorization', `Bearer ${token}`)
     .expect(400)
 })
 
