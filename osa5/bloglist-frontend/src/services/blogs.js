@@ -1,9 +1,21 @@
 import axios from 'axios'
-const baseUrl = '/api/blogs'
+
+const baseUrl = 'http://localhost:3003/api'
+
+let token = null
+
+const setToken = newToken => {
+  token = `bearer ${newToken}`
+}
 
 const getAll = () => {
-  const request = axios.get(baseUrl)
+  const request = axios.get(`${baseUrl}/blogs`)
   return request.then(response => response.data)
 }
 
-export default { getAll }
+const login = ({ username, password }) => {
+  const request = axios.post(`${baseUrl}/login`, { username, password })
+  return request.then(response => response.data)
+}
+
+export default { getAll, login, setToken }
