@@ -5,7 +5,7 @@ const baseUrl = 'http://localhost:3003/api'
 let token = null
 
 const setToken = newToken => {
-  token = `bearer ${newToken}`
+  token = `Bearer ${newToken}`
 }
 
 const getAll = () => {
@@ -18,4 +18,20 @@ const login = ({ username, password }) => {
   return request.then(response => response.data)
 }
 
-export default { getAll, login, setToken }
+const add = (blog) => {
+  console.log('Token:', token)
+
+  const headers = {
+    headers: {
+      Authorization: token,
+      'Content-Type': 'application/json'
+    }
+  }
+
+  console.log('Adding blog:', blog)
+
+  const request = axios.post(`${baseUrl}/blogs`, blog, headers)
+  return request.then(response => response.data)
+}
+
+export default { getAll, login, setToken, add }

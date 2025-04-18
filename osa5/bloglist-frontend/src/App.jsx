@@ -66,6 +66,24 @@ const App = () => {
     showMessage('Logged out successfully', 5, false)
   }
 
+  const handleCreate = async (event) => {
+    event.preventDefault()
+    console.log('Creating new blog:', event.target.title.value, event.target.author.value, event.target.url.value)
+    try {
+      const createdBlog = await blogService.add({
+        title: event.target.title.value,
+        author: event.target.author.value,
+        url: event.target.url.value
+      })
+      console.log("Blog created:", createdBlog)
+      setBlogs(blogs.concat(createdBlog))
+      showMessage(`A new blog ${createdBlog.title} by ${createdBlog.author} added`, 5, false)
+    } catch (error) {
+      console.error('Error creating blog:', error)
+      showMessage('Error creating blog', 5, true)
+    }
+  }
+
   const showMessage = (message, seconds, isError) => {
     console.log('Message:', message, seconds, isError)
     setMessage({message: message, isError: isError})
@@ -78,7 +96,7 @@ const App = () => {
     <div>
       {user === null ? (
         <div>
-          <h1>log in to application</h1>
+          <h1>log in to blogilista application</h1>
           <Message message={message.message} isError={message.isError} />
           <form onSubmit={handleLogin}>
           <div>
@@ -104,9 +122,17 @@ const App = () => {
         </div>
       ) : (
         <div>
-          <h1>blogs</h1>
+          <h1>blogilista application</h1>
           <Message message={message.message} isError={message.isError} />
           <LoggedInUser name={user.name} handleLogout={handleLogout} />
+          <h1>create new</h1>
+          <form onSubmit={handleCreate}>
+            <div>title: <input type="text" name="title" /></div>
+            <div>author: <input type="text" name="author" /></div>
+            <div>url: <input type="text" name="url" /></div>
+            <button type="submit">create</button>
+          </form>
+          <h1>blogs</h1>
           {blogs.map(blog =>
             <Blog key={blog.id} blog={blog} />
           )}
