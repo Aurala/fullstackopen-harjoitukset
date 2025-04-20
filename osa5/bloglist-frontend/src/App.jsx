@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import Message from './components/Message'
 import LoggedInUser from './components/LoggedInUser'
+import AddBlogForm from './components/AddBlogForm'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 
@@ -67,24 +68,18 @@ const App = () => {
     showMessage('Logged out successfully', 5, false)
   }
 
-  const handleCreate = async (event) => {
-    event.preventDefault()
-    console.log('Creating new blog:', event.target.title.value, event.target.author.value, event.target.url.value)
+  const addBlog = async (blogObject) => {
+    console.log('Creating new blog:', blogObject)
     try {
-      const createdBlog = await blogService.add({
-        title: event.target.title.value,
-        author: event.target.author.value,
-        url: event.target.url.value
-      })
+      const createdBlog = await blogService.add(blogObject)
       setBlogs(blogs.concat(createdBlog))
       showMessage(`A new blog ${createdBlog.title} by ${createdBlog.author} added`, 5, false)
       createFormRef.current.toggleVisibility()
-      event.target.title.value = ''
-      event.target.author.value = ''
-      event.target.url.value = ''
+      return createdBlog
     } catch (error) {
       console.error('Error creating blog:', error)
       showMessage('Error creating blog', 5, true)
+      throw error
     }
   }
 
@@ -130,13 +125,7 @@ const App = () => {
           <Message message={message.message} isError={message.isError} />
           <LoggedInUser name={user.name} handleLogout={handleLogout} />
           <Togglable buttonLabel="new note" ref={createFormRef}>
-            <h1>create new</h1>
-            <form onSubmit={handleCreate}>
-              <div>title: <input type="text" name="title" /></div>
-              <div>author: <input type="text" name="author" /></div>
-              <div>url: <input type="text" name="url" /></div>
-              <button type="submit">create</button>
-            </form>
+            <AddBlogForm addBlog={addBlog} />
           </Togglable>
           <h1>blogs</h1>
           {blogs.map(blog =>
