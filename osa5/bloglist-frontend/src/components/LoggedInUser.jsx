@@ -1,5 +1,3 @@
-// Component for displaying who is logged in
-
 const LoggedInUser = ({ name, handleLogout }) => {
   if (!name) {
     return null

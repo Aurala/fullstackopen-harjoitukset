@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import Message from './components/Message'
 import LoggedInUser from './components/LoggedInUser'
+import Togglable from './components/Togglable'
 import blogService from './services/blogs'
-import login from './services/blogs'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -11,6 +11,8 @@ const App = () => {
   const [password, setPassword] = useState('') 
   const [user, setUser] = useState(null)
   const [message, setMessage] = useState({message: null, isError: false})
+
+  const createFormRef = useRef()
 
   useEffect(() => {
     if (user) {
@@ -37,7 +39,7 @@ const App = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault()
-    console.log('Logging in with', username, password)
+    console.log('Logging in using credentials:', username, password)
     try {
       const user = await blogService.login({
         username, password,
@@ -48,13 +50,12 @@ const App = () => {
       )
       blogService.setToken(user.token)
 
-      console.log('Login successful:', user)
-      showMessage('Login successful', 5, false)
+      showMessage(`${user.name} logged in successfully`, 5, false)
       setUser(user)
       setUsername('')
       setPassword('')
-    } catch {
-      console.error('Login failed')
+    } catch (error) {
+      console.error('Login failed:', error)
       showMessage('Wrong credentials', 5, true)
     }
   }
@@ -75,9 +76,12 @@ const App = () => {
         author: event.target.author.value,
         url: event.target.url.value
       })
-      console.log("Blog created:", createdBlog)
       setBlogs(blogs.concat(createdBlog))
       showMessage(`A new blog ${createdBlog.title} by ${createdBlog.author} added`, 5, false)
+      createFormRef.current.toggleVisibility()
+      event.target.title.value = ''
+      event.target.author.value = ''
+      event.target.url.value = ''
     } catch (error) {
       console.error('Error creating blog:', error)
       showMessage('Error creating blog', 5, true)
@@ -125,13 +129,15 @@ const App = () => {
           <h1>blogilista application</h1>
           <Message message={message.message} isError={message.isError} />
           <LoggedInUser name={user.name} handleLogout={handleLogout} />
-          <h1>create new</h1>
-          <form onSubmit={handleCreate}>
-            <div>title: <input type="text" name="title" /></div>
-            <div>author: <input type="text" name="author" /></div>
-            <div>url: <input type="text" name="url" /></div>
-            <button type="submit">create</button>
-          </form>
+          <Togglable buttonLabel="new note" ref={createFormRef}>
+            <h1>create new</h1>
+            <form onSubmit={handleCreate}>
+              <div>title: <input type="text" name="title" /></div>
+              <div>author: <input type="text" name="author" /></div>
+              <div>url: <input type="text" name="url" /></div>
+              <button type="submit">create</button>
+            </form>
+          </Togglable>
           <h1>blogs</h1>
           {blogs.map(blog =>
             <Blog key={blog.id} blog={blog} />

@@ -1,5 +1,3 @@
-// Component for displaying error/status messages
-
 const Message = ({ message, isError }) => {
     if (!message) {
       return null
