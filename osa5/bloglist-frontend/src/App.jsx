@@ -72,7 +72,11 @@ const App = () => {
     console.log('Creating new blog:', blogObject)
     try {
       const createdBlog = await blogService.add(blogObject)
-      setBlogs(blogs.concat(createdBlog))
+
+      // The user info is missing if I just concat to blogs
+      const updatedBlogs = await blogService.getAll()
+      setBlogs(updatedBlogs)
+
       showMessage(`A new blog ${createdBlog.title} by ${createdBlog.author} added`, 5, false)
       createFormRef.current.toggleVisibility()
       return createdBlog
