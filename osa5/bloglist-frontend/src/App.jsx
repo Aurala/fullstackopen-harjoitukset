@@ -68,21 +68,32 @@ const App = () => {
     showMessage('Logged out successfully', 5, false)
   }
 
-  const addBlog = async (blogObject) => {
-    console.log('Creating new blog:', blogObject)
+  const addBlog = async (blogToAdd) => {
+    console.log('Creating new blog:', blogToAdd)
     try {
-      const createdBlog = await blogService.add(blogObject)
-
-      // The user info is missing if I just concat to blogs
+      const createdBlog = await blogService.add(blogToAdd)
       const updatedBlogs = await blogService.getAll()
       setBlogs(updatedBlogs)
-
       showMessage(`A new blog ${createdBlog.title} by ${createdBlog.author} added`, 5, false)
       createFormRef.current.toggleVisibility()
       return createdBlog
     } catch (error) {
       console.error('Error creating blog:', error)
       showMessage('Error creating blog', 5, true)
+      throw error
+    }
+  }
+
+  const addLike = async (blogToUpdate) => {
+    console.log('Adding a like:', blogToUpdate)
+    try {
+      const updatedBlog = await blogService.update(blogToUpdate)
+      setBlogs(blogs.map(b => b.id !== updatedBlog.id ? b : updatedBlog))
+      showMessage(`You liked ${updatedBlog.title} by ${updatedBlog.author}`, 5, false)
+      return updatedBlog
+    } catch (error) {
+      console.error('Error adding like:', error)
+      showMessage('Error adding like', 5, true)
       throw error
     }
   }
@@ -133,7 +144,7 @@ const App = () => {
           </Togglable>
           <h1>blogs</h1>
           {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} />
+            <Blog key={blog.id} blogObject={blog} addLike={addLike} />
           )}
         </div>
       )} 

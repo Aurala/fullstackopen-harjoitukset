@@ -28,10 +28,26 @@ const add = (blog) => {
     }
   }
 
-  console.log('Adding blog:', blog)
+  console.log('Adding blog:', headers, blog)
 
   const request = axios.post(`${baseUrl}/blogs`, blog, headers)
   return request.then(response => response.data)
 }
 
-export default { getAll, login, setToken, add }
+const update = (blog) => {
+  console.log('Token:', token)
+
+  const headers = {
+    headers: {
+      Authorization: token,
+      'Content-Type': 'application/json'
+    }
+  }
+
+  console.log('Updating blog:', headers, blog)
+
+  const request = axios.put(`${baseUrl}/blogs/${blog.id}`, blog, headers)
+  return request.then(response => response.data)
+}
+
+export default { getAll, login, setToken, add, update }
