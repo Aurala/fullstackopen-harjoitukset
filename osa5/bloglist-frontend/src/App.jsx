@@ -17,7 +17,7 @@ const App = () => {
 
   useEffect(() => {
     if (user) {
-      blogService.getAll().then(blogs => {
+      blogService.getAllBlogs().then(blogs => {
         console.log('Fetched blogs:', blogs)
         setBlogs(blogs)
       }).catch(error => {
@@ -51,6 +51,8 @@ const App = () => {
       )
       blogService.setToken(user.token)
 
+      console.log('User logged in:', user)
+
       showMessage(`${user.name} logged in successfully`, 5, false)
       setUser(user)
       setUsername('')
@@ -71,8 +73,8 @@ const App = () => {
   const addBlog = async (blogToAdd) => {
     console.log('Creating new blog:', blogToAdd)
     try {
-      const createdBlog = await blogService.add(blogToAdd)
-      const updatedBlogs = await blogService.getAll()
+      const createdBlog = await blogService.addBlog(blogToAdd)
+      const updatedBlogs = await blogService.getAllBlogs()
       setBlogs(updatedBlogs)
       showMessage(`A new blog ${createdBlog.title} by ${createdBlog.author} added`, 5, false)
       createFormRef.current.toggleVisibility()
@@ -87,7 +89,7 @@ const App = () => {
   const addLike = async (blogToUpdate) => {
     console.log('Adding a like:', blogToUpdate)
     try {
-      const updatedBlog = await blogService.update(blogToUpdate)
+      const updatedBlog = await blogService.updateBlog(blogToUpdate)
       setBlogs(blogs.map(b => b.id !== updatedBlog.id ? b : updatedBlog))
       showMessage(`You liked ${updatedBlog.title} by ${updatedBlog.author}`, 5, false)
       return updatedBlog
@@ -95,6 +97,18 @@ const App = () => {
       console.error('Error adding like:', error)
       showMessage('Error adding like', 5, true)
       throw error
+    }
+  }
+
+  const deleteBlog = async (id) => {
+    console.log('Deleting blog with id:', id)
+    try {
+      await blogService.deleteBlog(id)
+      setBlogs(blogs.filter(b => b.id !== id))
+      showMessage('Blog deleted successfully', 5, false)
+    } catch (error) {
+      console.error('Error deleting blog:', error)
+      showMessage('Error deleting blog', 5, true)
     }
   }
 
@@ -145,7 +159,7 @@ const App = () => {
           <h1>blogs</h1>
           {blogs
             .sort((a, b) => b.likes - a.likes)
-            .map(blog => <Blog key={blog.id} blogObject={blog} addLike={addLike} />)
+            .map(blog => <Blog key={blog.id} blogObject={blog} addLike={addLike} deleteBlog={deleteBlog} currentUsername={user.username}/>)
           }
         </div>
       )} 

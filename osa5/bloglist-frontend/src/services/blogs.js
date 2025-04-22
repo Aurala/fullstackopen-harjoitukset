@@ -8,7 +8,7 @@ const setToken = newToken => {
   token = `Bearer ${newToken}`
 }
 
-const getAll = () => {
+const getAllBlogs = () => {
   const request = axios.get(`${baseUrl}/blogs`)
   return request.then(response => response.data)
 }
@@ -18,7 +18,7 @@ const login = ({ username, password }) => {
   return request.then(response => response.data)
 }
 
-const add = (blog) => {
+const addBlog = (blog) => {
   console.log('Token:', token)
 
   const headers = {
@@ -34,7 +34,7 @@ const add = (blog) => {
   return request.then(response => response.data)
 }
 
-const update = (blog) => {
+const updateBlog = (blog) => {
   console.log('Token:', token)
 
   const headers = {
@@ -50,4 +50,20 @@ const update = (blog) => {
   return request.then(response => response.data)
 }
 
-export default { getAll, login, setToken, add, update }
+const deleteBlog = (id) => {
+  console.log('Token:', token)
+
+  const headers = {
+    headers: {
+      Authorization: token,
+      'Content-Type': 'application/json'
+    }
+  }
+
+  console.log('Deleting blog:', headers, id)
+
+  const request = axios.delete(`${baseUrl}/blogs/${id}`, headers)
+  return request.then(response => response.data)
+}
+
+export default { getAllBlogs, login, setToken, addBlog, updateBlog, deleteBlog }
