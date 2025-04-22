@@ -23,7 +23,7 @@ const App = () => {
       }).catch(error => {
         console.error('Error fetching blogs:', error)
         showMessage('Error fetching blogs', 5, true)
-      });
+      })
     } else {
       setBlogs([])
     }
@@ -127,25 +127,25 @@ const App = () => {
           <h1>log in to blogilista application</h1>
           <Message message={message.message} isError={message.isError} />
           <form onSubmit={handleLogin}>
-          <div>
-            username
+            <div>
+              username
               <input
-              type="text"
-              value={username}
-              name="Username"
-              onChange={({ target }) => setUsername(target.value)}
-            />
-          </div>
-          <div>
-            password
+                type="text"
+                value={username}
+                name="Username"
+                onChange={({ target }) => setUsername(target.value)}
+              />
+            </div>
+            <div>
+              password
               <input
-              type="password"
-              value={password}
-              name="Password"
-              onChange={({ target }) => setPassword(target.value)}
-            />
-          </div>
-          <button type="submit">login</button>
+                type="password"
+                value={password}
+                name="Password"
+                onChange={({ target }) => setPassword(target.value)}
+              />
+            </div>
+            <button type="submit">login</button>
           </form>
         </div>
       ) : (
