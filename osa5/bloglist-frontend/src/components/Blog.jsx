@@ -44,8 +44,8 @@ const Blog = ({ blogObject, addLike, deleteBlog, currentUsername }) => {
         {blog.likes} likes
         &nbsp;&nbsp;
         <button onClick={handleLike}>like</button><br />
-        added by {blog.user[0]?.name}
-        {blog.user[0]?.username === currentUsername
+        added by {blog.user?.[0]?.name}
+        {blog.user?.[0]?.username === currentUsername
           ? <div><button onClick={handleDelete}>remove</button></div>
           : null
         } 

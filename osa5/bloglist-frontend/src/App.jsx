@@ -153,7 +153,7 @@ const App = () => {
           <h1>blogilista application</h1>
           <Message message={message.message} isError={message.isError} />
           <LoggedInUser name={user.name} handleLogout={handleLogout} />
-          <Togglable buttonLabel="new note" ref={createFormRef}>
+          <Togglable buttonLabel="new blog" ref={createFormRef}>
             <AddBlogForm addBlog={addBlog} />
           </Togglable>
           <h1>blogs</h1>
