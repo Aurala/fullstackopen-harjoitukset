@@ -69,7 +69,6 @@ describe('Blogilista app', () => {
     await page.getByTestId('username').fill(testUser.username)
     await page.getByTestId('password').fill(testUser.password)
     await page.getByRole('button', { name: 'login' }).click()  
-    await expect(page.getByText(`${testUser.name} logged in successfully`, { exact: true })).toBeVisible()
 
     await page.getByRole('button', { name: 'new blog' }).click()
     await page.getByLabel('title:').fill(testBlogs[0].title)
@@ -80,6 +79,43 @@ describe('Blogilista app', () => {
     const blog = await page.locator('.blog').first()
     await expect(blog).toContainText(testBlogs[0].title)
     await expect(blog).toContainText(testBlogs[0].author)
+  })
+
+  test('User can see details of a blog', async ({ page }) => {
+    await page.getByTestId('username').fill(testUser.username)
+    await page.getByTestId('password').fill(testUser.password)
+    await page.getByRole('button', { name: 'login' }).click()  
+    await expect(page.getByText(`${testUser.name} logged in successfully`, { exact: true })).toBeVisible()
+
+    await page.getByRole('button', { name: 'new blog' }).click()
+    await page.getByLabel('title:').fill(testBlogs[0].title)
+    await page.getByLabel('author:').fill(testBlogs[0].author)
+    await page.getByLabel('url:').fill(testBlogs[0].url)
+    await page.getByRole('button', { name: 'create' }).click()
+
+    await page.getByRole('button', { name: 'view' }).click()
+    const blog = await page.locator('.blog').first()
+    await expect(blog).toContainText(testBlogs[0].url)
+    await expect(blog).toContainText('0 likes')
+    await expect(blog).toContainText(`added by ${testUser.name}`)
+  })
+
+  test('User can see like a blog', async ({ page }) => {
+    await page.getByTestId('username').fill(testUser.username)
+    await page.getByTestId('password').fill(testUser.password)
+    await page.getByRole('button', { name: 'login' }).click()  
+    await expect(page.getByText(`${testUser.name} logged in successfully`, { exact: true })).toBeVisible()
+
+    await page.getByRole('button', { name: 'new blog' }).click()
+    await page.getByLabel('title:').fill(testBlogs[0].title)
+    await page.getByLabel('author:').fill(testBlogs[0].author)
+    await page.getByLabel('url:').fill(testBlogs[0].url)
+    await page.getByRole('button', { name: 'create' }).click()
+
+    await page.getByRole('button', { name: 'view' }).click()
+    await page.getByRole('button', { name: 'like' }).click()
+    const blog = await page.locator('.blog').first()
+    await expect(blog).toContainText('1 likes')
   })
 
 })
