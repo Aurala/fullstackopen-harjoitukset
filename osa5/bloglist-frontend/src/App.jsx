@@ -128,8 +128,9 @@ const App = () => {
           <Message message={message.message} isError={message.isError} />
           <form onSubmit={handleLogin}>
             <div>
-              username
+              <label htmlFor="username">username:</label>
               <input
+                id="username"
                 type="text"
                 value={username}
                 name="Username"
@@ -137,8 +138,9 @@ const App = () => {
               />
             </div>
             <div>
-              password
+              <label htmlFor="password">password:</label>
               <input
+                id="password"
                 type="password"
                 value={password}
                 name="Password"

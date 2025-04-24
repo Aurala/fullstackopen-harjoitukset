@@ -30,11 +30,11 @@ describe('Blog component', () => {
   test('URL and likes are hidden by default', () => {
     render(<Blog blogObject={testBlog} addLike={() => {}} deleteBlog={() => {}} currentUsername="{hessu}"/>)
 
-  const hiddenDiv = document.querySelector('.hidden')
+    const hiddenDiv = document.querySelector('.hidden')
   
-  expect(hiddenDiv).not.toBeNull()
-  expect(hiddenDiv.textContent).toContain(testBlog.url)
-  expect(hiddenDiv.textContent).toContain(testBlog.likes)
+    expect(hiddenDiv).not.toBeNull()
+    expect(hiddenDiv.textContent).toContain(testBlog.url)
+    expect(hiddenDiv.textContent).toContain(testBlog.likes)
   })
 
   test('URL and likes are shown after the button is clicked', async () => {
