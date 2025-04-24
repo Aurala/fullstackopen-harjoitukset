@@ -6,6 +6,24 @@ const testUser = {
   password: 'testpass'
 }
 
+const testBlogs = [
+  {
+    title: 'Test Blog 1',
+    author: 'Test Author 1',
+    url: 'https://testblog.local/1'
+  },
+  {
+    title: 'Test Blog 2',
+    author: 'Test Author 2',
+    url: 'https://testblog.local/2'
+},
+  {
+    title: 'Test Blog 3',
+    author: 'Test Author 3',
+    url: 'https://testblog.local/3'
+  } 
+]
+
 describe('Blogilista app', () => {
   beforeEach(async ({ page, request }) => {
     await request.post('http://localhost:3003/api/testing/reset')
@@ -45,6 +63,23 @@ describe('Blogilista app', () => {
     await page.getByTestId('password').fill(testUser.password)
     await page.getByRole('button', { name: 'login' }).click()  
     await expect(page.getByText(`${testUser.name} logged in successfully`, { exact: true })).toBeVisible()
+  })
+
+  test('User can create a new blog', async ({ page }) => {
+    await page.getByTestId('username').fill(testUser.username)
+    await page.getByTestId('password').fill(testUser.password)
+    await page.getByRole('button', { name: 'login' }).click()  
+    await expect(page.getByText(`${testUser.name} logged in successfully`, { exact: true })).toBeVisible()
+
+    await page.getByRole('button', { name: 'new blog' }).click()
+    await page.getByLabel('title:').fill(testBlogs[0].title)
+    await page.getByLabel('author:').fill(testBlogs[0].author)
+    await page.getByLabel('url:').fill(testBlogs[0].url)
+    await page.getByRole('button', { name: 'create' }).click()
+
+    const blog = await page.locator('.blog').first()
+    await expect(blog).toContainText(testBlogs[0].title)
+    await expect(blog).toContainText(testBlogs[0].author)
   })
 
 })
