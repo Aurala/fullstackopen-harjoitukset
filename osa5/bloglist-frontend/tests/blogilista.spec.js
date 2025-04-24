@@ -1,10 +1,22 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
 
-const testUser = {
-  name: 'Test User',
-  username: 'test',
-  password: 'testpass'
-}
+const testUsers = [
+  {
+    name: 'Test User',
+    username: 'test1',
+    password: 'testpass'
+  },
+  {
+    name: 'Test User 2',
+    username: 'test2',
+    password: 'testpass'
+  },
+  { 
+    name: 'Test User 3',
+    username: 'test3',
+    password: 'testpass'
+  }
+] 
 
 const testBlogs = [
   {
@@ -28,7 +40,13 @@ describe('Blogilista app', () => {
   beforeEach(async ({ page, request }) => {
     await request.post('http://localhost:3003/api/testing/reset')
     await request.post('http://localhost:3003/api/users', {
-      data: testUser
+      data: testUsers[0]
+    })
+    await request.post('http://localhost:3003/api/users', {
+      data: testUsers[1]
+    })
+    await request.post('http://localhost:3003/api/users', {
+      data: testUsers[2]
     })
     await page.goto('http://localhost:5173')
   })
@@ -45,29 +63,36 @@ describe('Blogilista app', () => {
   })
 
   test('User can not log in with invalid credentials', async ({ page }) => {
-    await page.getByTestId('username').fill(testUser.username)
+    await page.getByTestId('username').fill(testUsers[0].username)
     await page.getByTestId('password').fill('thisisnotit')
     await page.getByRole('button', { name: 'login' }).click()
-  
     await expect(page.getByText('Wrong credentials')).toBeVisible()
   })
 
   test('User can not log in with missing credentials', async ({ page }) => {
     await page.getByRole('button', { name: 'login' }).click()
-  
     await expect(page.getByText('Wrong credentials')).toBeVisible()
   })
 
   test('User can log in with valid credentials', async ({ page }) => {
-    await page.getByTestId('username').fill(testUser.username)
-    await page.getByTestId('password').fill(testUser.password)
-    await page.getByRole('button', { name: 'login' }).click()  
-    await expect(page.getByText(`${testUser.name} logged in successfully`, { exact: true })).toBeVisible()
+    await page.getByTestId('username').fill(testUsers[0].username)
+    await page.getByTestId('password').fill(testUsers[0].password)
+    await page.getByRole('button', { name: 'login' }).click()
+    await expect(page.getByText(`${testUsers[0].name} logged in successfully`, { exact: true })).toBeVisible()
+  })
+
+  test('User can log out', async ({ page }) => {
+    await page.getByTestId('username').fill(testUsers[0].username)
+    await page.getByTestId('password').fill(testUsers[0].password)
+    await page.getByRole('button', { name: 'login' }).click()
+
+    await page.getByRole('button', { name: 'logout' }).click()
+    await expect(page.getByText(`Logged out successfully`, { exact: true })).toBeVisible()
   })
 
   test('User can create a new blog', async ({ page }) => {
-    await page.getByTestId('username').fill(testUser.username)
-    await page.getByTestId('password').fill(testUser.password)
+    await page.getByTestId('username').fill(testUsers[0].username)
+    await page.getByTestId('password').fill(testUsers[0].password)
     await page.getByRole('button', { name: 'login' }).click()  
 
     await page.getByRole('button', { name: 'new blog' }).click()
@@ -82,10 +107,9 @@ describe('Blogilista app', () => {
   })
 
   test('User can see details of a blog', async ({ page }) => {
-    await page.getByTestId('username').fill(testUser.username)
-    await page.getByTestId('password').fill(testUser.password)
+    await page.getByTestId('username').fill(testUsers[0].username)
+    await page.getByTestId('password').fill(testUsers[0].password)
     await page.getByRole('button', { name: 'login' }).click()  
-    await expect(page.getByText(`${testUser.name} logged in successfully`, { exact: true })).toBeVisible()
 
     await page.getByRole('button', { name: 'new blog' }).click()
     await page.getByLabel('title:').fill(testBlogs[0].title)
@@ -97,14 +121,13 @@ describe('Blogilista app', () => {
     const blog = await page.locator('.blog').first()
     await expect(blog).toContainText(testBlogs[0].url)
     await expect(blog).toContainText('0 likes')
-    await expect(blog).toContainText(`added by ${testUser.name}`)
+    await expect(blog).toContainText(`added by ${testUsers[0].name}`)
   })
 
-  test('User can see like a blog', async ({ page }) => {
-    await page.getByTestId('username').fill(testUser.username)
-    await page.getByTestId('password').fill(testUser.password)
+  test('User can like a blog', async ({ page }) => {
+    await page.getByTestId('username').fill(testUsers[0].username)
+    await page.getByTestId('password').fill(testUsers[0].password)
     await page.getByRole('button', { name: 'login' }).click()  
-    await expect(page.getByText(`${testUser.name} logged in successfully`, { exact: true })).toBeVisible()
 
     await page.getByRole('button', { name: 'new blog' }).click()
     await page.getByLabel('title:').fill(testBlogs[0].title)
@@ -116,6 +139,55 @@ describe('Blogilista app', () => {
     await page.getByRole('button', { name: 'like' }).click()
     const blog = await page.locator('.blog').first()
     await expect(blog).toContainText('1 likes')
+  })
+
+  test('User can delete a blog', async ({ page }) => {
+    await page.getByTestId('username').fill(testUsers[0].username)
+    await page.getByTestId('password').fill(testUsers[0].password)
+    await page.getByRole('button', { name: 'login' }).click()
+
+    await page.getByRole('button', { name: 'new blog' }).click()
+    await page.getByLabel('title:').fill(testBlogs[0].title)
+    await page.getByLabel('author:').fill(testBlogs[0].author)
+    await page.getByLabel('url:').fill(testBlogs[0].url)
+    await page.getByRole('button', { name: 'create' }).click()
+
+    await page.waitForSelector('.blog')
+
+    var count = await page.locator('.blog').count()
+    await expect(count).toBe(1)
+
+    page.on('dialog', dialog => dialog.accept())
+
+    await page.getByRole('button', { name: 'view' }).click()
+    await page.getByRole('button', { name: 'remove' }).click()
+
+    await expect(page.locator('.blog')).toHaveCount(0, { timeout: 5000 })
+
+    count = await page.locator('.blog').count()
+    await expect(count).toBe(0)
+  })
+
+  test('User can not the remove button if a blog belongs to someone else', async ({ page }) => {
+    await page.getByTestId('username').fill(testUsers[0].username)
+    await page.getByTestId('password').fill(testUsers[0].password)
+    await page.getByRole('button', { name: 'login' }).click()
+
+    await page.getByRole('button', { name: 'new blog' }).click()
+    await page.getByLabel('title:').fill(testBlogs[0].title)
+    await page.getByLabel('author:').fill(testBlogs[0].author)
+    await page.getByLabel('url:').fill(testBlogs[0].url)
+    await page.getByRole('button', { name: 'create' }).click()
+
+    await page.getByRole('button', { name: 'logout' }).click()
+
+    await page.getByTestId('username').fill(testUsers[1].username)
+    await page.getByTestId('password').fill(testUsers[1].password)
+    await page.getByRole('button', { name: 'login' }).click()
+
+    await page.getByRole('button', { name: 'view' }).click()
+
+    expect(page.getByRole('button', { name: 'remove' })).not.toBeVisible()
   })
 
 })
