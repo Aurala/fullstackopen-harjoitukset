@@ -1,11 +1,13 @@
 import { useSelector, useDispatch } from 'react-redux'
+import { addVote } from './reducers/anecdoteReducer'
 
 const App = () => {
-  const anecdotes = useSelector(state => state)
   const dispatch = useDispatch()
+  const anecdotes = useSelector(state => state)
 
   const vote = (id) => {
-    console.log('vote', id)
+    console.log('vote:', id)
+    dispatch(addVote(id))
   }
 
   return (
@@ -17,7 +19,7 @@ const App = () => {
             {anecdote.content}
           </div>
           <div>
-            has {anecdote.votes}
+            has {anecdote.votes}&nbsp;
             <button onClick={() => vote(anecdote.id)}>vote</button>
           </div>
         </div>
