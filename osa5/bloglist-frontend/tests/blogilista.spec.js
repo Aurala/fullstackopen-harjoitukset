@@ -190,4 +190,39 @@ describe('Blogilista app', () => {
     expect(page.getByRole('button', { name: 'remove' })).not.toBeVisible()
   })
 
+  test('Blogs are sorted by likes in descending order', async ({ page }) => {
+    test.setTimeout(10000)
+    
+    await page.getByTestId('username').fill(testUsers[0].username)
+    await page.getByTestId('password').fill(testUsers[0].password)
+    await page.getByRole('button', { name: 'login' }).click()
+
+    for (let i = 0; i < testBlogs.length; i++) {
+      await page.getByRole('button', { name: 'new blog' }).click()
+      await page.getByLabel('title:').fill(testBlogs[i].title)
+      await page.getByLabel('author:').fill(testBlogs[i].author)
+      await page.getByLabel('url:').fill(testBlogs[i].url)
+      await page.getByRole('button', { name: 'create' }).click()
+      await page.waitForTimeout(500)
+    }
+
+    for (let i = 0; i < testBlogs.length; i++) {
+      await page.getByRole('button', { name: 'view' }).first().click()
+      await page.waitForTimeout(500)
+    }
+
+    await page.locator(`.blog:has-text("${testBlogs[1].title}")`).getByRole('button', { name: 'like' }).click()
+    await page.locator(`.blog:has-text("${testBlogs[2].title}")`).getByRole('button', { name: 'like' }).click()
+    await page.locator(`.blog:has-text("${testBlogs[1].title}")`).getByRole('button', { name: 'like' }).click()
+
+    await expect(page.locator(`.blog:has-text("${testBlogs[0].title}")`)).toContainText('0 likes');
+    await expect(page.locator(`.blog:has-text("${testBlogs[1].title}")`)).toContainText('2 likes');
+    await expect(page.locator(`.blog:has-text("${testBlogs[2].title}")`)).toContainText('1 likes');
+  
+    const blogs = await page.locator('.blog').all()
+    await expect(blogs[0]).toContainText(testBlogs[1].title)
+    await expect(blogs[1]).toContainText(testBlogs[2].title)
+    await expect(blogs[2]).toContainText(testBlogs[0].title)
+  })
+
 })
