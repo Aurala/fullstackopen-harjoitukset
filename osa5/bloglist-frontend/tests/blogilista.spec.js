@@ -28,7 +28,7 @@ const testBlogs = [
     title: 'Test Blog 2',
     author: 'Test Author 2',
     url: 'https://testblog.local/2'
-},
+  },
   {
     title: 'Test Blog 3',
     author: 'Test Author 3',
@@ -56,9 +56,9 @@ describe('Blogilista app', () => {
     await expect(locator).toBeVisible()
     await expect(page.getByLabel('username:')).toBeVisible()
     await expect(page.getByLabel('password:')).toBeVisible()
-    await expect(page.getByRole('textbox', { name: 'username:' })).toBeVisible();
-    await expect(page.getByRole('textbox', { name: 'password:' })).toBeVisible();
-    await expect(page.locator('input[type="password"]')).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'username:' })).toBeVisible()
+    await expect(page.getByRole('textbox', { name: 'password:' })).toBeVisible()
+    await expect(page.locator('input[type="password"]')).toBeVisible()
     await expect(page.getByRole('button', { name: 'login' })).toBeVisible()
   })
 
@@ -87,7 +87,7 @@ describe('Blogilista app', () => {
     await page.getByRole('button', { name: 'login' }).click()
 
     await page.getByRole('button', { name: 'logout' }).click()
-    await expect(page.getByText(`Logged out successfully`, { exact: true })).toBeVisible()
+    await expect(page.getByText('Logged out successfully', { exact: true })).toBeVisible()
   })
 
   test('User can create a new blog', async ({ page }) => {
@@ -215,9 +215,9 @@ describe('Blogilista app', () => {
     await page.locator(`.blog:has-text("${testBlogs[2].title}")`).getByRole('button', { name: 'like' }).click()
     await page.locator(`.blog:has-text("${testBlogs[1].title}")`).getByRole('button', { name: 'like' }).click()
 
-    await expect(page.locator(`.blog:has-text("${testBlogs[0].title}")`)).toContainText('0 likes');
-    await expect(page.locator(`.blog:has-text("${testBlogs[1].title}")`)).toContainText('2 likes');
-    await expect(page.locator(`.blog:has-text("${testBlogs[2].title}")`)).toContainText('1 likes');
+    await expect(page.locator(`.blog:has-text("${testBlogs[0].title}")`)).toContainText('0 likes')
+    await expect(page.locator(`.blog:has-text("${testBlogs[1].title}")`)).toContainText('2 likes')
+    await expect(page.locator(`.blog:has-text("${testBlogs[2].title}")`)).toContainText('1 likes')
   
     const blogs = await page.locator('.blog').all()
     await expect(blogs[0]).toContainText(testBlogs[1].title)
