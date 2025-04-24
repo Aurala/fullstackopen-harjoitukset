@@ -131,6 +131,7 @@ const App = () => {
               <label htmlFor="username">username:</label>
               <input
                 id="username"
+                data-testid='username'
                 type="text"
                 value={username}
                 name="Username"
@@ -141,6 +142,7 @@ const App = () => {
               <label htmlFor="password">password:</label>
               <input
                 id="password"
+                data-testid='password'
                 type="password"
                 value={password}
                 name="Password"
