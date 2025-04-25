@@ -34,6 +34,10 @@ const addAnecdote = (anecdote) => {
   }
 }
 
+const sortAnecdotesByVotes = (anecdotes) => {
+  return [...anecdotes].sort((a, b) => b.votes - a.votes)
+}
+
 const reducer = (state = initialState, action) => {
   console.log('state now:', state)
   console.log('action:', action)
@@ -41,16 +45,17 @@ const reducer = (state = initialState, action) => {
   switch (action.type) {
     case 'VOTE': {
       const id = action.payload.id
-      console.log('id:', id)
+      console.log('Voting for an anecdote:', id)
       const anecdoteToVote = state.find(a => a.id === id)
       const votedAnecdote = { ...anecdoteToVote, votes: anecdoteToVote.votes + 1 }
-      return state.map(anecdote =>
-        anecdote.id !== id ? anecdote : votedAnecdote
+      return sortAnecdotesByVotes(state.map(anecdote =>
+        anecdote.id !== id ? anecdote : votedAnecdote)
       )
     }
     case 'ADD': {
+      console.log('Adding an anecdote:', action.payload.anecdoteToAdd)
       const anecdoteToAdd = action.payload.anecdoteToAdd
-      return [...state, anecdoteToAdd]
+      return sortAnecdotesByVotes([...state, anecdoteToAdd])
     }
     default: return state
   }
