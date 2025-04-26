@@ -1,4 +1,6 @@
 import { useDispatch } from 'react-redux'
+import { addAnecdote } from '../reducers/anecdoteReducer'
+import { showNotification } from '../reducers/notificationReducer'
 
 const AnecdoteForm = () => {
   const dispatch = useDispatch()
@@ -8,7 +10,8 @@ const AnecdoteForm = () => {
     const anecdote = event.target.anecdote.value
     if (anecdote.length > 0) {
       console.log('anecdote:', anecdote)
-      dispatch({ type: 'anecdotes/addAnecdote', payload: anecdote })
+      dispatch(addAnecdote(anecdote))
+      dispatch(showNotification(`Anecdote "${anecdote}" added`, 5))
       event.target.anecdote.value = ''
     }
   }
