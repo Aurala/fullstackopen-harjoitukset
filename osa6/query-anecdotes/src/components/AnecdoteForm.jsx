@@ -13,21 +13,22 @@ const AnecdoteForm = () => {
     mutationFn: createAnecdote,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['anecdotes'] })
+    },
+    onError: (error) => {
+      const errorMessage = error?.response?.data?.error || 'Unknown error'
+      console.error('Error creating anecdote:', error)
+      showNotification('Adding an anecdote failed (check the length, must be >= 5)', 5)
     }
   })
 
   const onCreate = (event) => {
     event.preventDefault()
     const content = event.target.anecdote.value
-    if (content.length > 4) {
-      event.target.anecdote.value = ''
-      console.log('New anecdote:', content)
-      newAnecdoteMutation.mutate({ content, votes: 0 })
-      showNotification(`Created anecdote '${content}'`, 5)
-    } else {
-      showNotification('Anecdote must be at least 5 characters', 5)
-    }
-}
+    event.target.anecdote.value = ''
+    console.log('New anecdote:', content)
+    newAnecdoteMutation.mutate({ content, votes: 0 })
+    showNotification(`Created anecdote '${content}'`, 5)
+  }
 
   return (
     <div>
