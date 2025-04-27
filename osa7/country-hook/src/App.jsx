@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
+const baseUrl = 'https://studies.cs.helsinki.fi/restcountries/api/name'
+
 const useField = (type) => {
   const [value, setValue] = useState('')
 
@@ -18,12 +20,34 @@ const useField = (type) => {
 const useCountry = (name) => {
   const [country, setCountry] = useState(null)
 
-  useEffect(() => {})
+  useEffect(() => {
+    if (name) {
+      console.log('Fetching country data for', name)
+      axios
+        .get(`${baseUrl}/${name}`)
+        .then(response => {
+          console.log('API response', response.data)
+          setCountry({
+            found: true,
+            data: response.data
+          })
+        })
+        .catch(() => {
+          console.log('Country not found')
+          setCountry({
+            found: false
+          })
+        })
+    }
+  }
+  , [name])
 
   return country
 }
 
 const Country = ({ country }) => {
+  console.log('Country data', country)
+
   if (!country) {
     return null
   }
@@ -36,12 +60,17 @@ const Country = ({ country }) => {
     )
   }
 
+  // The API has maybe changed since the template was created because these don't work anymore:
+  // - country.data.name
+  // - country.data.capital (in case of South Africa or other countries with multiple capitals)
+  // - country.data.flags
+
   return (
     <div>
-      <h3>{country.data.name} </h3>
-      <div>capital {country.data.capital} </div>
+      <h3>{country.data.name.common} </h3>
+      <div>capital {country.data.capital[0]} </div>
       <div>population {country.data.population}</div> 
-      <img src={country.data.flag} height='100' alt={`flag of ${country.data.name}`}/>  
+      <img src={country.data.flags.png} height='100' alt={`flag of ${country.data.name.common}`}/>  
     </div>
   )
 }
@@ -53,6 +82,7 @@ const App = () => {
 
   const fetch = (e) => {
     e.preventDefault()
+    console.log('Fetching country data', nameInput.value)
     setName(nameInput.value)
   }
 
