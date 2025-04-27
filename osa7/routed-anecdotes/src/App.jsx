@@ -1,5 +1,12 @@
 import { useState } from 'react'
-import { BrowserRouter as Router, Routes, Route, Link, useParams } from 'react-router-dom'
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useParams,
+  useNavigate
+} from 'react-router-dom'
 
 const Menu = () => {
   const padding = {
@@ -52,6 +59,7 @@ const Footer = () => (
 )
 
 const CreateNew = (props) => {
+  const navigate = useNavigate()
   const [content, setContent] = useState('')
   const [author, setAuthor] = useState('')
   const [info, setInfo] = useState('')
@@ -67,6 +75,7 @@ const CreateNew = (props) => {
     setContent('')
     setAuthor('')
     setInfo('')
+    navigate('/')
   }
 
   return (
@@ -134,6 +143,11 @@ const App = () => {
     anecdote.id = Math.round(Math.random() * 10000)
     setAnecdotes(anecdotes.concat(anecdote))
     console.log('Anecdotes after adding:', anecdotes)
+
+    setNotification(`A new anecdote ${anecdote.content} was created`)
+    setTimeout(() => {
+      setNotification('')
+    }, 5000)
   }
 
   const anecdoteById = (id) =>
@@ -150,11 +164,21 @@ const App = () => {
     setAnecdotes(anecdotes.map(a => a.id === id ? voted : a))
   }
 
+  const notificationStyle = {
+    border: 'solid',
+    padding: 10,
+    borderWidth: 1,
+    marginTop: 10,
+    marginBottom: 10
+  }
+
   return (
     <Router>
       <div>
         <h1>Software anecdotes</h1>
         <Menu />
+
+        {notification && <div style={notificationStyle}>{notification}</div>}
 
         <Routes>
           <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />} />
