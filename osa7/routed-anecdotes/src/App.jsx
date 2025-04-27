@@ -67,6 +67,7 @@ const CreateNew = (props) => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    console.log('Creating new anecdote')
     props.addNew({
       content: content.value,
       author: author.value,
@@ -78,11 +79,13 @@ const CreateNew = (props) => {
 
   const handleReset = (e) => {
     e.preventDefault()
+    console.log('Resetting form')
     content.reset()
     author.reset()
     info.reset()
   }
 
+  // Remove the reset function from the props given to the input fields
   const inputProps = ({ reset, ...props }) => props
 
   return (
