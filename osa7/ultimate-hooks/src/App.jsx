@@ -18,11 +18,22 @@ const useField = (type) => {
 const useResource = (baseUrl) => {
   const [resources, setResources] = useState([])
 
-  // ...
+  useEffect(() => {
+    console.log('Fetching resources from:', baseUrl)
+    axios.get(baseUrl)
+      .then(response => {
+        setResources(response.data)
+      })
+      .catch(error => console.error(`Error fetching from ${baseUrl}:`, error))
+  }, [baseUrl])
 
-  const create = (resource) => {
-    // ...
-  }
+  const create = async (newObject) => {
+    console.log('Creating new object:', newObject)
+    const response = await axios.post(baseUrl, newObject)
+    setResources(resources.concat(response.data))
+    console.log('Created object:', response.data)
+    return response.data
+}
 
   const service = {
     create
