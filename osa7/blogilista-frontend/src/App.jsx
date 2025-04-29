@@ -5,39 +5,38 @@ import LoggedInUser from './components/LoggedInUser'
 import AddBlogForm from './components/AddBlogForm'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { showNotification } from './reducers/notificationReducer'
+import {
+  initializeBlogs,
+  setBlogs,
+  createBlog,
+  likeBlog,
+  removeBlog,
+} from './reducers/blogsReducer'
 
 const App = () => {
   const dispatch = useDispatch()
-  const [blogs, setBlogs] = useState([])
+  const blogs = useSelector((state) => state.blogs)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [message, setMessage] = useState({ message: null, isError: false })
-
   const createFormRef = useRef()
 
   useEffect(() => {
     if (user) {
-      blogService
-        .getAllBlogs()
-        .then((blogs) => {
-          console.log('Fetched blogs:', blogs)
-          setBlogs(blogs)
-        })
-        .catch((error) => {
-          console.error('Error fetching blogs:', error)
-          dispatch(showNotification('Error fetching blogs', 5))
-        })
+      console.log('Initializing blogs')
+      dispatch(initializeBlogs())
     } else {
-      setBlogs([])
+      console.log('User is not logged in, clearing blogs')
+      dispatch(setBlogs([]))
     }
-  }, [user])
+  }, [user, dispatch])
 
   useEffect(() => {
     const loggedInUserJSON = window.localStorage.getItem('loggedInUser')
     if (loggedInUserJSON) {
+      console.log('User found in local storage:', loggedInUserJSON)
       const user = JSON.parse(loggedInUserJSON)
       setUser(user)
       blogService.setToken(user.token)
@@ -71,46 +70,27 @@ const App = () => {
   const handleLogout = () => {
     window.localStorage.removeItem('loggedInUser')
     setUser(null)
-    setBlogs([])
     dispatch(showNotification('Logged out successfully', 5))
   }
 
   const addBlog = async (blogToAdd) => {
     console.log('Creating new blog:', blogToAdd)
     try {
-      const createdBlog = await blogService.addBlog(blogToAdd)
-      const updatedBlogs = await blogService.getAllBlogs()
-      setBlogs(updatedBlogs)
-      dispatch(
-        showNotification(
-          `A new blog ${createdBlog.title} by ${createdBlog.author} added`,
-          5
-        )
-      )
+      const createdBlog = await dispatch(createBlog(blogToAdd))
       createFormRef.current.toggleVisibility()
       return createdBlog
     } catch (error) {
       console.error('Error creating blog:', error)
-      dispatch(showNotification('Error creating blog', 5))
       throw error
     }
   }
 
-  const addLike = async (blogToUpdate) => {
-    console.log('Adding a like:', blogToUpdate)
+  const addLike = async (likedBlog) => {
+    console.log('Adding a like:', likedBlog)
     try {
-      const updatedBlog = await blogService.updateBlog(blogToUpdate)
-      setBlogs(blogs.map((b) => (b.id !== updatedBlog.id ? b : updatedBlog)))
-      dispatch(
-        showNotification(
-          `You liked ${updatedBlog.title} by ${updatedBlog.author}`,
-          5
-        )
-      )
-      return updatedBlog
+      return await dispatch(likeBlog(likedBlog))
     } catch (error) {
-      console.error('Error adding like:', error)
-      dispatch(showNotification('Error adding like', 5))
+      console.error('Error liking a blog:', error)
       throw error
     }
   }
@@ -119,7 +99,7 @@ const App = () => {
     console.log('Deleting blog with id:', id)
     try {
       await blogService.deleteBlog(id)
-      setBlogs(blogs.filter((b) => b.id !== id))
+      dispatch(removeBlog(id))
       dispatch(showNotification('Blog deleted successfully', 5))
     } catch (error) {
       console.error('Error deleting blog:', error)
@@ -168,7 +148,7 @@ const App = () => {
             <AddBlogForm addBlog={addBlog} />
           </Togglable>
           <h1>blogs</h1>
-          {blogs
+          {[...blogs]
             .sort((a, b) => b.likes - a.likes)
             .map((blog) => (
               <Blog

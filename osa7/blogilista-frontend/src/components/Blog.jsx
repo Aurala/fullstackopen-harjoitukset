@@ -2,31 +2,29 @@ import { useState } from 'react'
 import PropTypes from 'prop-types'
 
 const Blog = ({ blogObject, addLike, deleteBlog, currentUsername }) => {
+  console.log('Blog component props:', blogObject, currentUsername)
+
   const [visible, setVisible] = useState(false)
-  const [blog, setBlog] = useState(blogObject)
 
   const toggleVisibility = () => {
     setVisible(!visible)
   }
 
   const handleLike = async () => {
-    const updatedBlogObject = {
-      ...blog,
-      likes: blog.likes + 1,
-    }
-
     try {
-      await addLike(updatedBlogObject)
-      setBlog(updatedBlogObject)
+      console.log('Liking blog:', blogObject)
+      await addLike(blogObject)
     } catch (error) {
-      console.error('Error adding blog:', error)
+      console.error('Error liking blog:', error)
     }
   }
 
   const handleDelete = async () => {
-    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
+    if (
+      window.confirm(`Remove blog ${blogObject.title} by ${blogObject.author}?`)
+    ) {
       try {
-        await deleteBlog(blog.id)
+        await deleteBlog(blogObject.id)
       } catch (error) {
         console.error('Error deleting blog:', error)
       }
@@ -35,17 +33,17 @@ const Blog = ({ blogObject, addLike, deleteBlog, currentUsername }) => {
 
   return (
     <div className="blog">
-      {blog.title} {blog.author}
+      {blogObject.title} {blogObject.author}
       &nbsp;&nbsp;
       <button onClick={toggleVisibility}>{visible ? 'hide' : 'view'}</button>
       <div className={visible ? 'visible' : 'hidden'}>
-        {blog.url}
+        {blogObject.url}
         <br />
-        {blog.likes} likes &nbsp;&nbsp;
+        {blogObject.likes} likes &nbsp;&nbsp;
         <button onClick={handleLike}>like</button>
         <br />
-        added by {blog.user?.[0]?.name}
-        {blog.user?.[0]?.username === currentUsername ? (
+        added by {blogObject.user[0].name}
+        {blogObject.user[0].username === currentUsername ? (
           <div>
             <button onClick={handleDelete}>remove</button>
           </div>
