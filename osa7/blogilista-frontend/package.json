@@ -13,10 +13,13 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.7.0",
     "axios": "^1.8.4",
     "prop-types": "^15.8.1",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-redux": "^9.2.0",
+    "redux": "^5.0.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.52.0",

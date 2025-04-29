@@ -1,12 +1,15 @@
 import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
-import Message from './components/Message'
+import Notification from './components/Notification'
 import LoggedInUser from './components/LoggedInUser'
 import AddBlogForm from './components/AddBlogForm'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
+import { useDispatch } from 'react-redux'
+import { showNotification } from './reducers/notificationReducer'
 
 const App = () => {
+  const dispatch = useDispatch()
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -25,7 +28,7 @@ const App = () => {
         })
         .catch((error) => {
           console.error('Error fetching blogs:', error)
-          showMessage('Error fetching blogs', 5, true)
+          dispatch(showNotification('Error fetching blogs', 5))
         })
     } else {
       setBlogs([])
@@ -55,13 +58,13 @@ const App = () => {
 
       console.log('User logged in:', user)
 
-      showMessage(`${user.name} logged in successfully`, 5, false)
+      dispatch(showNotification(`${user.name} logged in successfully`, 5))
       setUser(user)
       setUsername('')
       setPassword('')
     } catch (error) {
       console.error('Login failed:', error)
-      showMessage('Wrong credentials', 5, true)
+      dispatch(showNotification('Wrong credentials', 5))
     }
   }
 
@@ -69,7 +72,7 @@ const App = () => {
     window.localStorage.removeItem('loggedInUser')
     setUser(null)
     setBlogs([])
-    showMessage('Logged out successfully', 5, false)
+    dispatch(showNotification('Logged out successfully', 5))
   }
 
   const addBlog = async (blogToAdd) => {
@@ -78,16 +81,17 @@ const App = () => {
       const createdBlog = await blogService.addBlog(blogToAdd)
       const updatedBlogs = await blogService.getAllBlogs()
       setBlogs(updatedBlogs)
-      showMessage(
-        `A new blog ${createdBlog.title} by ${createdBlog.author} added`,
-        5,
-        false
+      dispatch(
+        showNotification(
+          `A new blog ${createdBlog.title} by ${createdBlog.author} added`,
+          5
+        )
       )
       createFormRef.current.toggleVisibility()
       return createdBlog
     } catch (error) {
       console.error('Error creating blog:', error)
-      showMessage('Error creating blog', 5, true)
+      dispatch(showNotification('Error creating blog', 5))
       throw error
     }
   }
@@ -97,15 +101,16 @@ const App = () => {
     try {
       const updatedBlog = await blogService.updateBlog(blogToUpdate)
       setBlogs(blogs.map((b) => (b.id !== updatedBlog.id ? b : updatedBlog)))
-      showMessage(
-        `You liked ${updatedBlog.title} by ${updatedBlog.author}`,
-        5,
-        false
+      dispatch(
+        showNotification(
+          `You liked ${updatedBlog.title} by ${updatedBlog.author}`,
+          5
+        )
       )
       return updatedBlog
     } catch (error) {
       console.error('Error adding like:', error)
-      showMessage('Error adding like', 5, true)
+      dispatch(showNotification('Error adding like', 5))
       throw error
     }
   }
@@ -115,19 +120,11 @@ const App = () => {
     try {
       await blogService.deleteBlog(id)
       setBlogs(blogs.filter((b) => b.id !== id))
-      showMessage('Blog deleted successfully', 5, false)
+      dispatch(showNotification('Blog deleted successfully', 5))
     } catch (error) {
       console.error('Error deleting blog:', error)
-      showMessage('Error deleting blog', 5, true)
+      dispatch(showNotification('Error deleting blog', 5))
     }
-  }
-
-  const showMessage = (message, seconds, isError) => {
-    console.log('Message:', message, seconds, isError)
-    setMessage({ message: message, isError: isError })
-    setTimeout(() => {
-      setMessage({ message: null, isError: false })
-    }, seconds * 1000)
   }
 
   return (
@@ -135,7 +132,7 @@ const App = () => {
       {user === null ? (
         <div>
           <h1>log in to blogilista application</h1>
-          <Message message={message.message} isError={message.isError} />
+          <Notification />
           <form onSubmit={handleLogin}>
             <div>
               <label htmlFor="username">username:</label>
@@ -165,7 +162,7 @@ const App = () => {
       ) : (
         <div>
           <h1>blogilista application</h1>
-          <Message message={message.message} isError={message.isError} />
+          <Notification />
           <LoggedInUser name={user.name} handleLogout={handleLogout} />
           <Togglable buttonLabel="new blog" ref={createFormRef}>
             <AddBlogForm addBlog={addBlog} />
