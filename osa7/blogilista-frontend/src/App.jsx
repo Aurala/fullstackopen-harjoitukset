@@ -12,15 +12,16 @@ import {
   setBlogs,
   createBlog,
   likeBlog,
-  removeBlog,
+  deleteBlogById,
 } from './reducers/blogsReducer'
+import { loginUser, logoutUser, initializeUser } from './reducers/userReducer'
 
 const App = () => {
   const dispatch = useDispatch()
   const blogs = useSelector((state) => state.blogs)
+  const user = useSelector((state) => state.user)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
   const createFormRef = useRef()
 
   useEffect(() => {
@@ -34,43 +35,25 @@ const App = () => {
   }, [user, dispatch])
 
   useEffect(() => {
-    const loggedInUserJSON = window.localStorage.getItem('loggedInUser')
-    if (loggedInUserJSON) {
-      console.log('User found in local storage:', loggedInUserJSON)
-      const user = JSON.parse(loggedInUserJSON)
-      setUser(user)
-      blogService.setToken(user.token)
-    }
+    console.log('Checking the local storage for logged in user')
+    dispatch(initializeUser())
   }, [])
 
   const handleLogin = async (event) => {
     event.preventDefault()
-    console.log('Logging in using credentials:', username, password)
     try {
-      const user = await blogService.login({
-        username,
-        password,
-      })
-
-      window.localStorage.setItem('loggedInUser', JSON.stringify(user))
-      blogService.setToken(user.token)
-
-      console.log('User logged in:', user)
-
-      dispatch(showNotification(`${user.name} logged in successfully`, 5))
-      setUser(user)
+      console.log('Logging in using credentials:', username, password)
+      await dispatch(loginUser({ username, password }))
       setUsername('')
       setPassword('')
     } catch (error) {
       console.error('Login failed:', error)
-      dispatch(showNotification('Wrong credentials', 5))
     }
   }
 
   const handleLogout = () => {
-    window.localStorage.removeItem('loggedInUser')
-    setUser(null)
-    dispatch(showNotification('Logged out successfully', 5))
+    console.log('Logging out user')
+    dispatch(logoutUser())
   }
 
   const addBlog = async (blogToAdd) => {
@@ -98,8 +81,7 @@ const App = () => {
   const deleteBlog = async (id) => {
     console.log('Deleting blog with id:', id)
     try {
-      await blogService.deleteBlog(id)
-      dispatch(removeBlog(id))
+      dispatch(deleteBlogById(id))
       dispatch(showNotification('Blog deleted successfully', 5))
     } catch (error) {
       console.error('Error deleting blog:', error)

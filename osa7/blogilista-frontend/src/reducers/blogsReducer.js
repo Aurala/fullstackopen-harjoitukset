@@ -75,23 +75,25 @@ export const likeBlog = (blogObject) => {
         likes: blogObject.likes + 1
       }
       const updatedBlog = await blogService.updateBlog(likedBlog)
+      console.log('Updated blog:', updatedBlog)
       dispatch(updateBlog(updatedBlog))
       dispatch(showNotification(`You liked ${updatedBlog.title} by ${updatedBlog.author}`, 5))
       return updatedBlog
     } catch (error) {
       console.error('Error liking blog:', error)
       dispatch(showNotification('Error liking blog', 5))
+      throw error
     }
   }
 }
 
-export const deleteBlog = (blogObject) => {
-  console.log('Deleting blog:', blogObject)
+export const deleteBlogById = (id) => {
+  console.log('Deleting blog:', id)
   return async (dispatch) => {
     try {
-      await blogService.deleteBlog(blogObject.id)
-      dispatch(removeBlog(blogObject.id))
-      dispatch(showNotification(`Deleted ${blogObject.title} by ${blogObject.author}`, 5))
+      await blogService.deleteBlog(id)
+      dispatch(removeBlog(id))
+      dispatch(showNotification(`Blog deleted successfully`, 5))
     } catch (error) {
       console.error('Error deleting blog:', error)
       dispatch(showNotification('Error deleting blog', 5))
