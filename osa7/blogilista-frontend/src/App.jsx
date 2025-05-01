@@ -14,12 +14,12 @@ import {
   likeBlog,
   deleteBlogById,
 } from './reducers/blogsReducer'
-import { loginUser, logoutUser, initializeUser } from './reducers/userReducer'
+import { useUser } from './UserContext'
 
 const App = () => {
   const dispatch = useDispatch()
   const blogs = useSelector((state) => state.blogs)
-  const user = useSelector((state) => state.user)
+  const { user, loginUser, logoutUser, initUser } = useUser()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const createFormRef = useRef()
@@ -36,14 +36,14 @@ const App = () => {
 
   useEffect(() => {
     console.log('Checking the local storage for logged in user')
-    dispatch(initializeUser())
+    initUser()
   }, [])
 
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
       console.log('Logging in using credentials:', username, password)
-      await dispatch(loginUser({ username, password }))
+      await loginUser({ username, password })
       setUsername('')
       setPassword('')
     } catch (error) {
@@ -53,7 +53,7 @@ const App = () => {
 
   const handleLogout = () => {
     console.log('Logging out user')
-    dispatch(logoutUser())
+    logoutUser()
   }
 
   const addBlog = async (blogToAdd) => {
